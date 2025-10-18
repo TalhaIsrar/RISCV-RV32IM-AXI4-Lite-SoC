@@ -21,7 +21,9 @@ The design supports the base **RV32I** instruction set along with **M-extension*
 * [How to Run](#-how-to-run)
 * [Test Example](#-test-example)
 * [Future Work](#-future-work)
+* [References](#-references)
 * [License](#-license)
+* [Contributions](#-contributions)
 
 ---
 
