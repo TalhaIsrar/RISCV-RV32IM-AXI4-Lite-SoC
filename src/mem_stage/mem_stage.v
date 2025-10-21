@@ -10,6 +10,15 @@ module mem_stage(
     output wire [31:0] calculated_result
 );
 
+
+    //TODO: Integrate AXI4-lite here
+    //TODO: Make sure load store still work
+    //TODO: Make sure byte/hardword/word store/load still works
+    //TODO: Stall CPU if AXI4-lite based approach takes multiple cycles
+    //TODO: Modify the MEM/WB Pipeline module because it doesnt register the read_data signal
+
+
+/**
     // Instantiate the Data Memory
     data_mem data_mem_inst (
         .clk(clk),
@@ -21,6 +30,7 @@ module mem_stage(
         .write_data(op2_data),
         .read_data(read_data)
     );   
+**/
 
     assign calculated_result = result;
 
