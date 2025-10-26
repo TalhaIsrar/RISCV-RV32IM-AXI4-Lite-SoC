@@ -10,7 +10,7 @@ module axi4_lite_read_master #(
     input logic [ADDR_WIDTH - 1 : 0]    read_addr,
 
     output logic [DATA_WIDTH - 1 : 0]   read_data,
-    output logic                        busy,
+    output logic                        read_busy,
 
     // AXI4-lite interface
 
@@ -44,9 +44,9 @@ module axi4_lite_read_master #(
         ST_IDLE         = 2'b00,
         ST_ADDR_PHASE   = 2'b01,
         ST_WAIT_RDATA   = 2'b10
-    } m_axi_write_states;
+    } m_axi_read_states;
 
-    m_axi_write_states current_state, next_state;
+    m_axi_read_states current_state, next_state;
 
     // State Register
     always_ff @(posedge clk or posedge rst) begin
@@ -76,7 +76,7 @@ module axi4_lite_read_master #(
     // Output logic
     always_comb begin
         // Default assignments for all signals
-        busy          = 0;
+        read_busy     = 0;
         read_data     = 0;
         M_AXI_ARADDR  = 0;
         M_AXI_ARVALID = 0;
@@ -86,12 +86,12 @@ module axi4_lite_read_master #(
         // IDLE has all zeros so no need to write
         case (current_state)
             ST_ADDR_PHASE: begin
-                busy          = 1;
+                read_busy     = 1;
                 M_AXI_ARADDR  = buf_read_addr;
                 M_AXI_ARVALID = 1;
             end
             ST_WAIT_RDATA: begin
-                busy         = 1;
+                read_busy    = 1;
                 M_AXI_RREADY = 1;
             end
         endcase

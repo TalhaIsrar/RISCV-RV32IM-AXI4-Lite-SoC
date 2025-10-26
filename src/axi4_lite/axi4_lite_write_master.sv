@@ -11,7 +11,7 @@ module axi4_lite_write_master #(
     input logic [DATA_WIDTH - 1 : 0]    write_data,
     input logic [3:0]                   write_strobe,
 
-    output logic                        busy,
+    output logic                        write_busy,
 
     // AXI4-lite interface
 
@@ -88,7 +88,7 @@ module axi4_lite_write_master #(
     // Output logic
     always_comb begin
         // Default assignments for all signals
-        busy          = 0;
+        write_busy    = 0;
         M_AXI_AWADDR  = 0;
         M_AXI_AWVALID = 0;
         M_AXI_WDATA   = 0;
@@ -100,15 +100,15 @@ module axi4_lite_write_master #(
         // IDLE has all zeros so no need to write
         case (current_state)
             ST_ADDR_PHASE: begin
-                busy          = 1;
+                write_busy    = 1;
                 M_AXI_AWADDR  = buf_write_addr;
                 M_AXI_AWVALID = 1;
                 M_AXI_WVALID  = 1;
                 M_AXI_WDATA   = buf_write_data;
                 M_AXI_WSTRB   = buf_write_strobe;
             end
-            WAIT_BRESP: begin
-                busy         = 1;
+            ST_WAIT_BRESP: begin
+                write_busy   = 1;
                 M_AXI_BREADY = 1;
             end
         endcase
