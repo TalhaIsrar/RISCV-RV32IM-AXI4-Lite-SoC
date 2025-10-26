@@ -320,6 +320,7 @@ module rv32i_core(
         .result(mem_result),
         .op2_data(mem_op2_selected),
         .mem_write(mem_memory_write),
+        .mem_read(mem_wb_load),
         .store_type(mem_memory_store_type),
         .load_type(mem_memory_load_type),
         .read_data(mem_read_data),
