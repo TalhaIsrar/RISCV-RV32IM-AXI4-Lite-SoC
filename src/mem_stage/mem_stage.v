@@ -1,3 +1,5 @@
+`include "../defines.vh"
+
 module mem_stage(
     input clk,
     input rst,
@@ -26,6 +28,30 @@ module mem_stage(
     wire [1:0] byte_offset;
     assign byte_offset = addr[1:0];
 
+    // Generate byte strobe for axi4lite write channel
+    wire [3:0] write_byte_strobe;
+
+    // Combinational block to convert store type and byte offset to byte enables
+    always @(*) begin
+        case (store_type)
+            `STORE_SB: begin
+                if (byte_offset == 2'b00) write_byte_strobe = 4'b0001;
+                if (byte_offset == 2'b01) write_byte_strobe = 4'b0010;
+                if (byte_offset == 2'b10) write_byte_strobe = 4'b0100;
+                if (byte_offset == 2'b11) write_byte_strobe = 4'b1000;
+            end
+            `STORE_SH: begin
+                write_byte_strobe = !byte_offset[1] ? 4'b0011 : 4'b1100;
+            end 
+            `STORE_SW: begin
+                write_byte_strobe = 4'b1111;
+            end
+            default: begin
+                write_byte_strobe = 4'b0000;
+            end
+        endcase
+    end
+
     // Instantiate the Data Memory
     data_mem data_mem_inst (
         .clk(clk),
@@ -44,10 +70,9 @@ module mem_stage(
     reg [31:0] read_data_axi;
 
     // Perform byte/half-word selection and sign/zero extension *after* the read.
-    // This logic is combinatorial and will be synthesized as muxes outside the BRAM.
     always @(*) begin
         case (load_type)
-            3'b000: begin // LB - load byte, sign extend
+            `LOAD_LB: begin // LB - load byte, sign extend
                 case (byte_offset)
                     2'b00: read_data = {{24{read_data_axi[7]}},  read_data_axi[7:0]};
                     2'b01: read_data = {{24{read_data_axi[15]}}, read_data_axi[15:8]};
@@ -56,14 +81,14 @@ module mem_stage(
                     default: read_data = 32'h00000000;
                 endcase
             end
-            3'b001: begin // LH - load halfword, sign extend
+            `LOAD_HD: begin // LH - load halfword, sign extend
                 if (byte_offset[1] == 1'b0) read_data = {{16{read_data_axi[15]}}, read_data_axi[15:0]};
                 else                        read_data = {{16{read_data_axi[31]}}, read_data_axi[31:16]};
             end
-            3'b010: begin // LW - load word
+            `LOAD_LW: begin // LW - load word
                 read_data = read_data_axi;
             end
-            3'b011: begin // LBU - load byte, zero extend
+            `LOAD_LBU: begin // LBU - load byte, zero extend
                 case (byte_offset)
                     2'b00: read_data = {24'h0, read_data_axi[7:0]};
                     2'b01: read_data = {24'h0, read_data_axi[15:8]};
@@ -72,7 +97,7 @@ module mem_stage(
                     default: read_data = 32'h00000000;
                 endcase
             end
-            3'b100: begin // LHU - load halfword, zero extend
+            `LOAD_LHU: begin // LHU - load halfword, zero extend
                 if (byte_offset[1] == 1'b0) read_data = {16'h0, read_data_axi[15:0]};
                 else                        read_data = {16'h0, read_data_axi[31:16]};
             end
