@@ -10,8 +10,6 @@ module axi4_lite_write_slave #(
     output logic [3:0]                  byte_en,
     output logic [ADDR_WIDTH - 1 : 0]   addr,
     output logic [DATA_WIDTH - 1 : 0]   write_data,
-    
-    input  logic [DATA_WIDTH - 1 : 0]   read_data,
 
     // AXI4-lite interface
 
