@@ -41,12 +41,12 @@ module axi4_lite_write_master #(
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
             buf_write_addr      <= 0;
-            buf_write_data       <= 0;
+            buf_write_data      <= 0;
             buf_write_strobe    <= 0;
         end else begin
             if (write_start) begin
                 buf_write_addr     <= write_addr;
-                buf_write_data      <= write_data;
+                buf_write_data     <= write_data;
                 buf_write_strobe   <= write_strobe;
             end
         end
