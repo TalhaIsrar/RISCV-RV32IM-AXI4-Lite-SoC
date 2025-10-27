@@ -53,7 +53,7 @@ module axi4_lite_master #(
     axi4_lite_write_master #(
         .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH(DATA_WIDTH)
-    ) write_if (
+    ) master_write_if (
         .clk(clk),
         .rst(rst),
         .write_start(write_start),
@@ -79,7 +79,7 @@ module axi4_lite_master #(
     axi4_lite_read_master #(
         .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH(DATA_WIDTH)
-    ) read_if (
+    ) master_read_if (
         .clk(clk),
         .rst(rst),
         .read_start(read_start),
