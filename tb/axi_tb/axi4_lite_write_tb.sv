@@ -96,7 +96,7 @@ module axi4_lite_write_tb;
         .rst(rst),
         .mem_write(mem_write),
         .byte_en(byte_en),
-        .addr(mem_addr[11:0]),
+        .write_addr(mem_addr[11:0]),
         .write_data(mem_write_data),
         .read_data(read_data)
     );
