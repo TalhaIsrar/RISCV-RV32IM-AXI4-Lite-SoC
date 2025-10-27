@@ -14,13 +14,10 @@ module data_mem (
     // The `ram_style` attribute explicitly tells Vivado to use BRAM.
     (* ram_style = "block" *) reg [31:0] mem [0:255];
 
-    // Address for the 32-bit word.
-    wire [9:0] word_read_addr = read_addr[11:2];
-
     // Implement a single, synchronous read operation.
     // This is the core of BRAM inference.
     always @(posedge clk) begin
-        read_data <= mem[word_read_addr];
+        read_data <= mem[read_addr];
     end
 
     // Implement synchronous write with byte-enables.

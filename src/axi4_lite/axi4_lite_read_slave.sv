@@ -68,7 +68,6 @@ module axi4_lite_read_slave #(
         S_AXI_RDATA       = 0; 
         S_AXI_RRESP       = 0; 
         S_AXI_RVALID      = 0;
-        addr        = 0; 
 
         case(current_state)
             ST_IDLE:       

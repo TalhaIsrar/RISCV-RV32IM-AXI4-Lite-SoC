@@ -32,7 +32,7 @@ module axi4_lite_slave #(
     // WRITE RESPONSE CHANNEL
     output logic [1:0]                  S_AXI_BRESP,    // Slave response - Unused here
     output logic                        S_AXI_BVALID,   // Write response valid from slave
-    input logic                         S_AXI_BREADY    // Master ready to accept response
+    input logic                         S_AXI_BREADY,   // Master ready to accept response
 
     // READ ADDRESS CHANNEL
     input logic [ADDR_WIDTH - 1 : 0]    S_AXI_ARADDR,   // Read address

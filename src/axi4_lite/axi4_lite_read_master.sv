@@ -77,7 +77,6 @@ module axi4_lite_read_master #(
     always_comb begin
         // Default assignments for all signals
         read_busy     = 0;
-        read_data     = 0;
         M_AXI_ARADDR  = 0;
         M_AXI_ARVALID = 0;
         M_AXI_RREADY  = 0;
