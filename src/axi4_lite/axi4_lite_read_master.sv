@@ -67,7 +67,7 @@ module axi4_lite_read_master #(
                 next_state = M_AXI_ARREADY ? ST_WAIT_RDATA : ST_ADDR_PHASE;
 
             ST_WAIT_RDATA:
-                next_state = M_AXI_RVALID ? ST_IDLE : ST_WAIT_RDATA;
+                next_state = M_AXI_RVALID ? (read_start ? ST_ADDR_PHASE : ST_IDLE) : ST_WAIT_RDATA;
 
             default: next_state = ST_IDLE;
         endcase

@@ -79,7 +79,7 @@ module axi4_lite_write_master #(
                 next_state = (M_AXI_AWREADY & M_AXI_WREADY) ? ST_WAIT_BRESP : ST_ADDR_PHASE;
 
             ST_WAIT_BRESP:
-                next_state = M_AXI_BVALID ? ST_IDLE : ST_WAIT_BRESP;
+                next_state = M_AXI_BVALID ? (write_start ? ST_ADDR_PHASE : ST_IDLE) : ST_WAIT_BRESP;
 
             default: next_state = ST_IDLE;
         endcase

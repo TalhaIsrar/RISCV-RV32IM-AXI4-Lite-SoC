@@ -144,6 +144,7 @@ module axi4_lite_tb;
         read_addr   = 0;
 
         #50;
+        @(negedge clk);
 
         // Write 0xAABBCCDD to address 0x04
         write_addr   = 32'h04;
@@ -154,7 +155,7 @@ module axi4_lite_tb;
 
         // Wait for write completion
         wait(!write_busy);
-        #30;
+        @(negedge clk);
 
         // Read back
         read_addr    = 32'h04;

@@ -75,7 +75,7 @@ module axi4_lite_read_slave #(
 
             ST_SEND_DATA: begin
                 S_AXI_RVALID    = 1;
-                S_AXI_RDATA     = data_buf;
+                S_AXI_RDATA     = read_data;
             end
         endcase
     end
