@@ -8,7 +8,6 @@ module axi4_lite_peripheral_top #(
     input logic                    clk,
     input logic                    rst,
 
-    // Master side signals
     // Write interface
     input  logic                   write_start,
     input  logic [ADDR_WIDTH-1:0]  write_addr,
@@ -21,16 +20,6 @@ module axi4_lite_peripheral_top #(
     input  logic [ADDR_WIDTH-1:0]  read_addr,
     output logic [DATA_WIDTH-1:0]  read_data,
     output logic                   read_busy
-
-    // Slave side signals
-    // Peripheral interface outputs
-    output logic [SLAVE_NUM-1:0]                 mem_write,
-    output logic [SLAVE_NUM-1:0][3:0]            byte_en,
-    output logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] write_addr,
-    output logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] write_data,
-    input  logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] read_data,
-    output logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] read_addr,
-    output logic [SLAVE_NUM-1:0]                 data_valid
 );
 
     // Master interface signals
@@ -38,6 +27,15 @@ module axi4_lite_peripheral_top #(
 
     // Slave interface array
     axi4_lite_if #(ADDR_WIDTH, DATA_WIDTH) slave_if[SLAVE_NUM];
+
+    // Peripheral interface outputs
+    logic [SLAVE_NUM-1:0]                 mem_write;
+    logic [SLAVE_NUM-1:0][3:0]            byte_en;
+    logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] write_addr;
+    logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] write_data;
+    logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] read_data;
+    logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] read_addr;
+    logic [SLAVE_NUM-1:0]                 data_valid;
 
     // Master module instance
     axi4_lite_master #(
@@ -90,7 +88,7 @@ module axi4_lite_peripheral_top #(
                 .write_data(write_data[i]),
 
                 .read_data(read_data[i]),
-                .data_valid(data_valid[i]),
+                .data_valid(1'b1),
                 .read_addr(read_addr[i]),
 
                 // Connect AXI interface
@@ -98,5 +96,29 @@ module axi4_lite_peripheral_top #(
             );
         end
     endgenerate
+
+    // Instantiate memory 1
+    data_mem mem1 (
+        .clk(clk),
+        .rst(rst),
+        .mem_write(mem_write[0]),
+        .byte_en(byte_en[0]),
+        .write_addr(mem_write_addr[0][11:0]),
+        .read_addr(mem_read_addr[0][11:0]),
+        .write_data(mem_write_data[0]),
+        .read_data(mem_read_data[0])
+    );
+
+    // Instantiate memory 2
+    data_mem mem2 (
+        .clk(clk),
+        .rst(rst),
+        .mem_write(mem_write[1]),
+        .byte_en(byte_en[1]),
+        .write_addr(mem_write_addr[1][11:0]),
+        .read_addr(mem_read_addr[1][11:0]),
+        .write_data(mem_write_data[1]),
+        .read_data(mem_read_data[1])
+    );
 
 endmodule
