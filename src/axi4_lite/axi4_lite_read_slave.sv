@@ -5,6 +5,7 @@ module axi4_lite_read_slave #(
     // Input
     input logic                         clk,
     input logic                         rst,
+    input logic                         slave_read_sel,
 
     input logic [DATA_WIDTH - 1 : 0]    read_data,
     input                               data_valid,
@@ -49,7 +50,7 @@ module axi4_lite_read_slave #(
     always_comb begin : NEXT_STATE_LOGIC
         case (current_state) 
             ST_IDLE: 
-                next_state = S_AXI_ARVALID ? ST_WAIT_DATA : ST_IDLE;
+                next_state = (S_AXI_ARVALID && slave_read_sel) ? ST_WAIT_DATA : ST_IDLE;
 
             ST_WAIT_DATA:
                 next_state = data_valid ? ST_SEND_DATA : ST_WAIT_DATA;
@@ -85,7 +86,7 @@ module axi4_lite_read_slave #(
         if (rst) begin
             addr      <= 0;
         end else begin
-            if (S_AXI_ARVALID) begin
+            if (S_AXI_ARVALID && slave_read_sel) begin
                 addr  <= S_AXI_ARADDR;
             end
 

@@ -5,6 +5,7 @@ module axi4_lite_write_slave #(
     // Input
     input logic                         clk,
     input logic                         rst,
+    input logic                         slave_write_sel,
 
     output logic                        mem_write,
     output logic [3:0]                  byte_en,
@@ -52,7 +53,7 @@ module axi4_lite_write_slave #(
     always_comb begin : NEXT_STATE_LOGIC
         case (current_state) 
             ST_IDLE: 
-                next_state = S_AXI_AWVALID ? ST_ADDR_PHASE : ST_IDLE;
+                next_state = (S_AXI_AWVALID && slave_write_sel) ? ST_ADDR_PHASE : ST_IDLE;
 
             ST_ADDR_PHASE:
                 next_state = (S_AXI_AWVALID && S_AXI_WVALID) ? ST_BRESP : ST_ADDR_PHASE;
