@@ -59,7 +59,7 @@ module mem_stage(
     // Stall signals from axi
     wire write_busy, read_busy;
 
-    assign stall_axi = write_busy && read_busy; 
+    assign stall_axi = write_busy || read_busy; 
 
     axi4_lite_peripheral_top axi4_lite_bus(
         .clk(clk),

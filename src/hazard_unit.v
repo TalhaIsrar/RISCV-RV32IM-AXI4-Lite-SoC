@@ -9,12 +9,14 @@ module hazard_unit(
     input jump_branch_taken,
     input invalid_inst,
     input stall,
-    input stall_axi,
+    input mem_read_write,
 
     output reg if_id_pipeline_flush,
     output reg if_id_pipeline_en,
     output reg id_ex_pipeline_flush,
     output reg id_ex_pipeline_en,
+    output reg ex_mem_pipeline_flush,
+    output reg mem_wb_pipeline_en,
     output reg pc_en,
     output reg load_stall
 );
@@ -48,12 +50,21 @@ module hazard_unit(
         id_ex_pipeline_en = 1'b1;
         pc_en = 1'b1;
         load_stall = 1'b0;
+        ex_mem_pipeline_flush = 1'b0;
+        mem_wb_pipeline_en = 1'b1;
 
         // Jump/Branch taken flush - 2 Stall
         if (jump_branch_taken) begin
             if_id_pipeline_flush = 1'b1;
             if_id_pipeline_en = 1'b0;
             id_ex_pipeline_flush = 1'b1;
+
+        end else if (mem_read_write) begin
+            if_id_pipeline_en = 1'b0;
+            id_ex_pipeline_en = 1'b0;
+            pc_en = 1'b0;
+            ex_mem_pipeline_flush = 1'b1;
+            mem_wb_pipeline_en = 1'b0;
 
         // Load flush - 1 Stall
         end else if (load_hazard) begin
@@ -63,7 +74,7 @@ module hazard_unit(
             load_stall = 1'b1;
         end
 
-        else if (stall || stall_axi) begin
+        else if (stall) begin
             if_id_pipeline_en = 1'b0;
             id_ex_pipeline_en = 1'b0;
             pc_en = 1'b0;
