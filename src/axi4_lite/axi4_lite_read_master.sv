@@ -90,6 +90,7 @@ module axi4_lite_read_master #(
                 M_AXI_ARVALID = 1;
             end
             ST_WAIT_RDATA: begin
+                M_AXI_ARADDR  = buf_read_addr;
                 read_busy    = 1;
                 M_AXI_RREADY = 1;
             end

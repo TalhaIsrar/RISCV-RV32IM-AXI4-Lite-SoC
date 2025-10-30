@@ -1,9 +1,7 @@
-import axi4_lite_addr_map_package::*;
-
 module axi4_lite_interconnect #(
-    parameter ADDR_WIDTH = ADDR_WIDTH,
-    parameter DATA_WIDTH = DATA_WIDTH,
-    parameter int SLAVE_NUM   = SLAVE_NUM,
+    parameter ADDR_WIDTH = 32,
+    parameter DATA_WIDTH = 32,
+    parameter int SLAVE_NUM   = 2,
     parameter logic [ADDR_WIDTH-1:0] SLAVE_BASE_ADDR [SLAVE_NUM],
     parameter logic [ADDR_WIDTH-1:0] SLAVE_ADDR_MASK [SLAVE_NUM]
 )(
@@ -19,7 +17,6 @@ module axi4_lite_interconnect #(
 
     // Slave select signal - Based on decoding
     logic [SLAVE_NUM-1:0]           write_sel, read_sel;
-    logic [$clog2(SLAVE_NUM)-1:0]   write_sel_idx, read_sel_idx;
 
     // --- Decode write and read addresses ---
     axi4_lite_addr_decoder #(
@@ -29,8 +26,7 @@ module axi4_lite_interconnect #(
         .SLAVE_ADDR_MASK (SLAVE_ADDR_MASK)
     ) write_decoder (
         .addr(master_if.AWADDR),
-        .slave_sel(write_sel),
-        .sel_idx(write_sel_idx)
+        .slave_sel(write_sel)
     );
 
     axi4_lite_addr_decoder #(
@@ -40,8 +36,7 @@ module axi4_lite_interconnect #(
         .SLAVE_ADDR_MASK (SLAVE_ADDR_MASK)
     ) read_decoder (
         .addr(master_if.ARADDR),
-        .slave_sel(read_sel),
-        .sel_idx(read_sel_idx)
+        .slave_sel(read_sel)
     );
 
     // Master -> Slave Signals routing

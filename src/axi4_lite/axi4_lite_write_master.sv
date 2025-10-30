@@ -108,6 +108,7 @@ module axi4_lite_write_master #(
                 M_AXI_WSTRB   = buf_write_strobe;
             end
             ST_WAIT_BRESP: begin
+                M_AXI_AWADDR  = buf_write_addr;
                 write_busy   = 1;
                 M_AXI_BREADY = 1;
             end

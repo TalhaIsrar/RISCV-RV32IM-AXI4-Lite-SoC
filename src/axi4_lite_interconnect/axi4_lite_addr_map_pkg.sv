@@ -16,7 +16,7 @@ package axi4_lite_addr_map_package;
     // Address Mask for each slave
     localparam logic [ADDR_WIDTH - 1 : 0] SLAVE_ADDR_MASK [SLAVE_NUM] = '{
         32'hFFFF_FF00,  // 1 KB Memory
-        32'hFFFF_0000   // 1 KB Memory
+        32'hFFFF_FF00   // 1 KB Memory
     };
 
 endpackage
