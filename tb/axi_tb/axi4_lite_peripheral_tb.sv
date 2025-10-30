@@ -95,8 +95,6 @@ module axi4_lite_peripheral_tb;
         // Display results
         if (write_start_i) $display("WRITE: Addr=0x%08h, Data=0x%08h", write_addr_i, write_data_i);
         if (read_start_i)  $display("READ : Addr=0x%08h, Data=0x%08h", read_addr_i, read_data);
-        @(negedge clk);
-
     endtask
 
 

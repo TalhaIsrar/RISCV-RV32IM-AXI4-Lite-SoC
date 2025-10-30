@@ -9,6 +9,7 @@ module hazard_unit(
     input jump_branch_taken,
     input invalid_inst,
     input stall,
+    input stall_axi,
 
     output reg if_id_pipeline_flush,
     output reg if_id_pipeline_en,
@@ -62,7 +63,7 @@ module hazard_unit(
             load_stall = 1'b1;
         end
 
-        else if (stall) begin
+        else if (stall || stall_axi) begin
             if_id_pipeline_en = 1'b0;
             id_ex_pipeline_en = 1'b0;
             pc_en = 1'b0;

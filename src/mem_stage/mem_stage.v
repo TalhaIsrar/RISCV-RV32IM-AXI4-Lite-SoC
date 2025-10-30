@@ -10,7 +10,8 @@ module mem_stage(
     input [1:0] store_type,
     input [2:0] load_type,
     output reg [31:0] read_data,
-    output wire [31:0] calculated_result
+    output wire [31:0] calculated_result,
+    output wire stall_axi
 );
 
 
@@ -52,22 +53,27 @@ module mem_stage(
         endcase
     end
 
-    // Instantiate the Data Memory
-    data_mem data_mem_inst (
+    // Read data from axi interconnect
+    wire [31:0] read_data_axi;
+
+    // Stall signals from axi
+    wire write_busy, read_busy;
+
+    assign stall_axi = write_busy && read_busy; 
+
+    axi4_lite_peripheral_top axi4_lite_bus(
         .clk(clk),
         .rst(rst),
-        .mem_write(mem_write),
-        .store_type(store_type),
-        .load_type(load_type),
-        .addr(result[11:0]),
+        .write_start(mem_write),
+        .write_addr(result),
         .write_data(op2_data),
-        .read_data(read_data)
-    );   
-
-
-
-    // Read data from axi interconnect
-    reg [31:0] read_data_axi;
+        .write_strobe(write_byte_strobe),
+        .write_busy(write_busy),
+        .read_start(mem_read),
+        .read_addr(result),
+        .read_data(read_data_axi),
+        .read_busy(read_busy)
+    );
 
     // Perform byte/half-word selection and sign/zero extension *after* the read.
     always @(*) begin

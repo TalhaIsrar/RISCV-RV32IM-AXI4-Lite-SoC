@@ -97,7 +97,9 @@ module axi4_lite_peripheral_top #(
         end
     endgenerate
 
-    // Instantiate memory 1
+    // Slaves
+
+    // Slave 1 - Data Memory
     data_memory mem1 (
         .clk(clk),
         .rst(rst),
@@ -109,7 +111,7 @@ module axi4_lite_peripheral_top #(
         .read_data(peripheral_read_data[0])
     );
 
-    // Instantiate memory 2
+    // Slave 2 - Data Memory
     data_memory mem2 (
         .clk(clk),
         .rst(rst),

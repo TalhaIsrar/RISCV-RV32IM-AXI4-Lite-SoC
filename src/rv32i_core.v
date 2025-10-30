@@ -25,6 +25,7 @@ module rv32i_core(
     wire invalid_inst;
     wire load_stall;
     wire m_type_inst;
+    wire stall_axi;
 
     // IF/ID Connection
     wire [31:0] if_instruction, id_instruction;
@@ -281,6 +282,7 @@ module rv32i_core(
         .jump_branch_taken(ex_if_jump_en),
         .invalid_inst(invalid_inst),
         .stall(m_unit_busy || m_unit_ready),
+        .stall_axi(stall_axi),
         .if_id_pipeline_flush(if_id_pipeline_flush),
         .if_id_pipeline_en(if_id_pipeline_en),
         .id_ex_pipeline_flush(id_ex_pipeline_flush),
@@ -324,7 +326,8 @@ module rv32i_core(
         .store_type(mem_memory_store_type),
         .load_type(mem_memory_load_type),
         .read_data(mem_read_data),
-        .calculated_result(mem_calculated_result)
+        .calculated_result(mem_calculated_result),
+        .stall_axi(stall_axi)
     );
 
     // Instantiate the MEM/WB pipeline module
