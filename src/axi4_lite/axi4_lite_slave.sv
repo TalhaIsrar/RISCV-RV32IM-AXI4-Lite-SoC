@@ -5,10 +5,6 @@ module axi4_lite_slave #(
     input  logic                   clk,
     input  logic                   rst,
 
-    // Slave select signals
-    input  logic                   slave_write_sel,
-    input  logic                   slave_read_sel,
-
     // Write interface to peripheral
     output logic                   mem_write,
     output logic [3:0]             byte_en,
@@ -32,7 +28,6 @@ module axi4_lite_slave #(
     ) slave_write_if (
         .clk(clk),
         .rst(rst),
-        .slave_write_sel(slave_write_sel),
         .mem_write(mem_write),
         .byte_en(byte_en),
         .addr(write_addr),
@@ -58,7 +53,6 @@ module axi4_lite_slave #(
     ) slave_read_if (
         .clk(clk),
         .rst(rst),
-        .slave_read_sel(slave_read_sel),
         .read_data(read_data),
         .data_valid(data_valid),
         .addr(read_addr),

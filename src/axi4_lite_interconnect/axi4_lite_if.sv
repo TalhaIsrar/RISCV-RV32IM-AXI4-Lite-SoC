@@ -28,4 +28,20 @@ interface axi4_lite_if
     logic                  RVALID;
     logic                  RREADY;
 
+    // Modports for direction
+    modport master (
+        output AWADDR, AWVALID, WDATA, WSTRB, WVALID, BREADY,
+               ARADDR, ARVALID, RREADY,
+        input  AWREADY, WREADY, BRESP, BVALID,
+               ARREADY, RDATA, RRESP, RVALID
+    );
+
+    modport slave (
+        input  AWADDR, AWVALID, WDATA, WSTRB, WVALID, BREADY,
+               ARADDR, ARVALID, RREADY,
+        output AWREADY, WREADY, BRESP, BVALID,
+               ARREADY, RDATA, RRESP, RVALID
+    );
+
+
 endinterface
