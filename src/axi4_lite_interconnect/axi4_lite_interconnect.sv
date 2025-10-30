@@ -49,7 +49,7 @@ module axi4_litw_interconnect #(
     generate
         for (i = 0; i < SLAVE_NUM; i++) begin : gen_slave_connect
             // Write channels
-            assign slave_if[i].AWADDR  = master_if.AWADDR;
+            assign slave_if[i].AWADDR  = master_if.AWADDR - SLAVE_BASE_ADDR[i];
             assign slave_if[i].AWVALID = master_if.AWVALID & write_sel[i];
             assign slave_if[i].WDATA   = master_if.WDATA;
             assign slave_if[i].WSTRB   = master_if.WSTRB;
@@ -57,7 +57,7 @@ module axi4_litw_interconnect #(
             assign slave_if[i].BREADY  = master_if.BREADY & write_sel[i];
 
             // Read channels
-            assign slave_if[i].ARADDR  = master_if.ARADDR;
+            assign slave_if[i].ARADDR  = master_if.ARADDR - SLAVE_BASE_ADDR[i];
             assign slave_if[i].ARVALID = master_if.ARVALID & read_sel[i];
             assign slave_if[i].RREADY  = master_if.RREADY & read_sel[i];
         end
