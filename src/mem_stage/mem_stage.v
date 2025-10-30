@@ -9,7 +9,7 @@ module mem_stage(
     input mem_read,
     input [1:0] store_type,
     input [2:0] load_type,
-    output wire [31:0] read_data,
+    output reg [31:0] read_data,
     output wire [31:0] calculated_result
 );
 
@@ -26,10 +26,10 @@ module mem_stage(
 
     // Byte offset from address
     wire [1:0] byte_offset;
-    assign byte_offset = addr[1:0];
+    assign byte_offset = result[1:0];
 
     // Generate byte strobe for axi4lite write channel
-    wire [3:0] write_byte_strobe;
+    reg [3:0] write_byte_strobe;
 
     // Combinational block to convert store type and byte offset to byte enables
     always @(*) begin

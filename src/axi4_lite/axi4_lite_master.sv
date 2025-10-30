@@ -19,7 +19,7 @@ module axi4_lite_master #(
     output logic                   read_busy,
 
     // Unified AXI4-Lite interface
-    axi4_lite_if #(ADDR_WIDTH, DATA_WIDTH) master_if
+    axi4_lite_if master_if
 );
 
     // ------------------------------

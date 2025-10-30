@@ -11,11 +11,11 @@ module axi4_lite_addr_decoder #(
 
     integer i;
     always_comb begin
-        sel      = '0;
+        slave_sel      = '0;
         sel_idx  = '0;
         for (i = 0; i < SLAVE_NUM; i++) begin
             if ((addr & SLAVE_ADDR_MASK[i]) == SLAVE_BASE_ADDR[i]) begin
-                sel[i] = 1'b1;
+                slave_sel[i] = 1'b1;
                 sel_idx = i[$clog2(SLAVE_NUM)-1:0];
             end
         end

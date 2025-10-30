@@ -17,7 +17,7 @@ module axi4_lite_slave #(
     output logic [ADDR_WIDTH-1:0]  read_addr,
 
     // Unified AXI4-Lite interface
-    axi4_lite_if #(ADDR_WIDTH, DATA_WIDTH) slave_if
+    axi4_lite_if slave_if
 );
 
     // ----------------------------------

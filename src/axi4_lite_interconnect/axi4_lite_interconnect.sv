@@ -1,6 +1,6 @@
 import axi4_lite_addr_map_package::*;
 
-module axi4_litw_interconnect #(
+module axi4_lite_interconnect #(
     parameter ADDR_WIDTH = ADDR_WIDTH,
     parameter DATA_WIDTH = DATA_WIDTH,
     parameter int SLAVE_NUM   = SLAVE_NUM,
@@ -14,7 +14,7 @@ module axi4_litw_interconnect #(
     axi4_lite_if master_if,
 
     // Multiple slave interfaces
-    axi4_lite_if slave_if [SLAVES]
+    axi4_lite_if slave_if [SLAVE_NUM]
 );
 
     // Slave select signal - Based on decoding
@@ -29,7 +29,7 @@ module axi4_litw_interconnect #(
         .SLAVE_ADDR_MASK (SLAVE_ADDR_MASK)
     ) write_decoder (
         .addr(master_if.AWADDR),
-        .sel(write_sel),
+        .slave_sel(write_sel),
         .sel_idx(write_sel_idx)
     );
 
@@ -40,7 +40,7 @@ module axi4_litw_interconnect #(
         .SLAVE_ADDR_MASK (SLAVE_ADDR_MASK)
     ) read_decoder (
         .addr(master_if.ARADDR),
-        .sel(read_sel),
+        .slave_sel(read_sel),
         .sel_idx(read_sel_idx)
     );
 
@@ -64,14 +64,72 @@ module axi4_litw_interconnect #(
     endgenerate
 
     // Slave -> Master Signals routing
-    assign master_if.AWREADY = |(write_sel & '{slave_if.AWREADY});
-    assign master_if.WREADY  = |(write_sel & '{slave_if.WREADY});
-    assign master_if.BVALID  = |(write_sel & '{slave_if.BVALID});
-    assign master_if.BRESP   = slave_if[write_sel_idx].BRESP;
+    // Declare vectors for slave->master signals
+    logic [SLAVE_NUM-1:0] awready_vec, wready_vec, bvalid_vec;
+    logic [SLAVE_NUM-1:0] arready_vec, rvalid_vec;
 
-    assign master_if.ARREADY = |(read_sel & '{slave_if.ARREADY});
-    assign master_if.RVALID  = |(read_sel & '{slave_if.RVALID});
-    assign master_if.RDATA   = slave_if[read_sel_idx].RDATA;
-    assign master_if.RRESP   = slave_if[read_sel_idx].RRESP;
+    logic [DATA_WIDTH-1:0] rdata_mux [SLAVE_NUM];
+    logic [1:0]            rresp_mux [SLAVE_NUM];
+    logic [1:0]            bresp_mux [SLAVE_NUM];
+
+    genvar k;
+    generate
+        for (k = 0; k < SLAVE_NUM; k++) begin : slave_master_or
+            // AND with slave select for correct routing
+            assign awready_vec[k] = slave_if[k].AWREADY & write_sel[k];
+            assign wready_vec[k]   = slave_if[k].WREADY   & write_sel[k];
+            assign bvalid_vec[k]   = slave_if[k].BVALID   & write_sel[k];
+            assign arready_vec[k]  = slave_if[k].ARREADY  & read_sel[k];
+            assign rvalid_vec[k]   = slave_if[k].RVALID   & read_sel[k];
+
+            assign rdata_mux[k] = read_sel[k] ? slave_if[k].RDATA : '0;
+            assign rresp_mux[k] = read_sel[k] ? slave_if[k].RRESP : '0;
+            assign bresp_mux[k] = write_sel[k] ? slave_if[k].BRESP : '0;
+        end
+    endgenerate
+
+    // Reduce vectors to single master signals
+    assign master_if.AWREADY = |awready_vec;
+    assign master_if.WREADY  = |wready_vec;
+    assign master_if.BVALID  = |bvalid_vec;
+    assign master_if.ARREADY = |arready_vec;
+    assign master_if.RVALID  = |rvalid_vec;
+    
+    // RDATA mux
+    logic [DATA_WIDTH-1:0] rdata_tmp;
+    integer m;
+    always_comb begin
+        rdata_tmp = '0;
+        for (m = 0; m < SLAVE_NUM; m++) begin
+            if (read_sel[m])
+                rdata_tmp = rdata_tmp | rdata_mux[m];
+        end
+    end
+    assign master_if.RDATA = rdata_tmp;
+
+    // RRESP mux (2-bit)
+    logic [1:0] rresp_tmp;
+    integer n;
+    always_comb begin
+        rresp_tmp = '0;
+        for (n = 0; n < SLAVE_NUM; n++) begin
+            if (read_sel[n])
+                rresp_tmp = rresp_tmp | rresp_mux[n];
+        end
+    end
+    assign master_if.RRESP = rresp_tmp;
+
+    // BRESP mux (2-bit)
+    logic [1:0] bresp_tmp;
+    integer o;
+    always_comb begin
+        bresp_tmp = '0;
+        for (o = 0; o < SLAVE_NUM; o++) begin
+            if (write_sel[o])
+                bresp_tmp = bresp_tmp | bresp_mux[o];
+        end
+    end
+    assign master_if.BRESP = bresp_tmp;
+
 
 endmodule

@@ -1,4 +1,4 @@
-module data_mem (
+module data_memory (
     input clk,
     input rst,
     input mem_write,       // 1 = write, 0 = read

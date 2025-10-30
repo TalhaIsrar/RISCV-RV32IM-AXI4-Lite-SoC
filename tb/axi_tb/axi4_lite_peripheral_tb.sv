@@ -61,8 +61,7 @@ module axi4_lite_peripheral_tb;
         input  logic [3:0]  write_strobe_i,
         input  logic        write_start_i,
         input  logic [31:0] read_addr_i,
-        input  logic        read_start_i,
-        output logic [31:0] read_data_o
+        input  logic        read_start_i
     );
         // Initialize signals
         if (write_start_i) begin
@@ -93,12 +92,11 @@ module axi4_lite_peripheral_tb;
 
         @(negedge clk);
 
-        // Capture read data if read was enabled
-        if (read_start_i) read_data_o = read_data;
-
         // Display results
         if (write_start_i) $display("WRITE: Addr=0x%08h, Data=0x%08h", write_addr_i, write_data_i);
-        if (read_start_i)  $display("READ : Addr=0x%08h, Data=0x%08h", read_addr_i, read_data_o);
+        if (read_start_i)  $display("READ : Addr=0x%08h, Data=0x%08h", read_addr_i, read_data);
+        @(negedge clk);
+
     endtask
 
 

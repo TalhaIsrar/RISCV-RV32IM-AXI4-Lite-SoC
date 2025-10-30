@@ -23,19 +23,19 @@ module axi4_lite_peripheral_top #(
 );
 
     // Master interface signals
-    axi4_lite_if #(ADDR_WIDTH, DATA_WIDTH) master_if;
+    axi4_lite_if #(ADDR_WIDTH, DATA_WIDTH) master_if();
 
     // Slave interface array
-    axi4_lite_if #(ADDR_WIDTH, DATA_WIDTH) slave_if[SLAVE_NUM];
+    axi4_lite_if #(ADDR_WIDTH, DATA_WIDTH) slave_if[SLAVE_NUM]();
 
     // Peripheral interface outputs
-    logic [SLAVE_NUM-1:0]                 mem_write;
-    logic [SLAVE_NUM-1:0][3:0]            byte_en;
-    logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] write_addr;
-    logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] write_data;
-    logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] read_data;
-    logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] read_addr;
-    logic [SLAVE_NUM-1:0]                 data_valid;
+    logic [SLAVE_NUM-1:0]                 peripheral_mem_write;
+    logic [SLAVE_NUM-1:0][3:0]            peripheral_byte_en;
+    logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] peripheral_write_addr;
+    logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] peripheral_write_data;
+    logic [SLAVE_NUM-1:0][DATA_WIDTH-1:0] peripheral_read_data;
+    logic [SLAVE_NUM-1:0][ADDR_WIDTH-1:0] peripheral_read_addr;
+    logic [SLAVE_NUM-1:0]                 peripheral_data_valid;
 
     // Master module instance
     axi4_lite_master #(
@@ -53,7 +53,7 @@ module axi4_lite_peripheral_top #(
         .read_addr(read_addr),
         .read_data(read_data),
         .read_busy(read_busy),
-        .M_AXI(master_if)
+        .master_if(master_if)
     );
 
     // Interconnect instance
@@ -82,14 +82,14 @@ module axi4_lite_peripheral_top #(
                 .rst(rst),
 
                 // Connect peripheral outputs
-                .mem_write(mem_write[i]),
-                .byte_en(byte_en[i]),
-                .write_addr(write_addr[i]),
-                .write_data(write_data[i]),
+                .mem_write(peripheral_mem_write[i]),
+                .byte_en(peripheral_byte_en[i]),
+                .write_addr(peripheral_write_addr[i]),
+                .write_data(peripheral_write_data[i]),
 
-                .read_data(read_data[i]),
+                .read_data(peripheral_read_data[i]),
                 .data_valid(1'b1),
-                .read_addr(read_addr[i]),
+                .read_addr(peripheral_read_addr[i]),
 
                 // Connect AXI interface
                 .slave_if(slave_if[i])
@@ -98,27 +98,27 @@ module axi4_lite_peripheral_top #(
     endgenerate
 
     // Instantiate memory 1
-    data_mem mem1 (
+    data_memory mem1 (
         .clk(clk),
         .rst(rst),
-        .mem_write(mem_write[0]),
-        .byte_en(byte_en[0]),
-        .write_addr(mem_write_addr[0][11:0]),
-        .read_addr(mem_read_addr[0][11:0]),
-        .write_data(mem_write_data[0]),
-        .read_data(mem_read_data[0])
+        .mem_write(peripheral_mem_write[0]),
+        .byte_en(peripheral_byte_en[0]),
+        .write_addr(peripheral_write_addr[0][11:0]),
+        .read_addr(peripheral_read_addr[0][11:0]),
+        .write_data(peripheral_write_data[0]),
+        .read_data(peripheral_read_data[0])
     );
 
     // Instantiate memory 2
-    data_mem mem2 (
+    data_memory mem2 (
         .clk(clk),
         .rst(rst),
-        .mem_write(mem_write[1]),
-        .byte_en(byte_en[1]),
-        .write_addr(mem_write_addr[1][11:0]),
-        .read_addr(mem_read_addr[1][11:0]),
-        .write_data(mem_write_data[1]),
-        .read_data(mem_read_data[1])
+        .mem_write(peripheral_mem_write[1]),
+        .byte_en(peripheral_byte_en[1]),
+        .write_addr(peripheral_write_addr[1][11:0]),
+        .read_addr(peripheral_read_addr[1][11:0]),
+        .write_data(peripheral_write_data[1]),
+        .read_data(peripheral_read_data[1])
     );
 
 endmodule
