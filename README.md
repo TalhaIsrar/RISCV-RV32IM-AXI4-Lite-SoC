@@ -45,9 +45,13 @@ src/
   ├── pipeline_registers/
   ├── branch_target_buffer/
   ├── m_unit_extension/ 
+  ├── axi4_lite/
+  ├── axi4_lite_interconnect/ 
+  ├── peripherals/ 
+  ├── axi4_lite_peripheral_top.sv 
   ├── forwarding_unit.v
   ├── hazard_unit.v
-  ├── rv32i_core.v
+  ├── riscv_soc_top.v
   └── defines.vh
 tb/                   Testbenches
 programs/             Sample RISC-V programs
@@ -71,8 +75,8 @@ Each stage has its own folder with detailed documentation:
 ### Special Notes
 
 * In **IF/ID**, no extra instruction register is needed (instruction memory has 1-cycle latency).
-* In **MEM/EX**, no pipeline register for memory result is required (synchronous read provides natural delay).
-* **IF/ID** and **ID/EX** pipeline registers support **flush** and **enable** signals from the hazard unit. On flush, all signals turn into a NOP.
+* Some pipelines have flush and enable signals to stall or flush the instructions.
+* Unused instruction memory addresses are not initalized to anything to avoid reset overhead.
 
 ---
 
@@ -80,6 +84,7 @@ Each stage has its own folder with detailed documentation:
 
 * [Branch Target Buffer (BTB)](src/branch_target_buffer/README.md) – simple branch predictor with update mechanism.
 * [M Unit](src/m_unit_extension/README.md) – RV32M extension, hardware multiplier/divider.
+* [AXI4 Lite Interconnect](src/axi4_lite_interconnect/README.md) – Interconnect structure supporting Single Master - Multiple Slave configuration
 * [Forwarding Unit](src/README.md) – resolves data hazards by forwarding from MEM/WB.
 * [Hazard Unit](src/README.md) – detects load-use hazards, handles pipeline stalls and flushes.
 
@@ -125,37 +130,37 @@ See [BTB Tests](tb/README.md#test-categories) for more details
 
 ## ⏱ Timing
 
-* Maximum clock frequency achieved: **70 MHz** on Nexys A7 (XC7A100T).
+* Maximum clock frequency achieved: **75 MHz** on Nexys A7 (XC7A100T).
 * Critical path: Execute stage (ALU + forwarding logic + PC Jump Address).
 
-![Timing Summary](imgs/implementation/timing.png)
+![Timing Summary](imgs/implementation/riscv_soc_timing.png)
 
 ---
 
 ## 📊 FPGA Resource Utilization
 
-* The results are Post-Implementation results for Nexys A7 (XC7A100T) at 70MHz.
+* The results are Post-Implementation results for Nexys A7 (XC7A100T) at 75MHz.
 
 | Resource        | Utilization |
 | --------------- | ----------- |
-| Slice LUTs      | 2063        |
-| Slice Registers | 780         |
-| BRAM            | 1           |
+| Slice LUTs      | 2179        |
+| Slice Registers | 988         |
+| BRAM            | 1.5         |
 | DSP Blocks      | 4           |
 
-![Utilization Summary](imgs/implementation/utilization.png)
+![Utilization Summary](imgs/implementation/riscv_soc_utilization.png)
 
 ---
 
 ### ⚡ Power Consumption
 
-* **Dynamic Power:** 0.039 W (due to switching activity during operation)
+* **Dynamic Power:** 0.010 W (due to switching activity during operation)
 * **Static Power:** 0.091 W (leakage and idle power)
-* **Total Estimated Power:** 0.13 W
+* **Total Estimated Power:** 0.102 W
 
-💡 *These numbers come from Vivado’s post-implementation power report at 70 MHz.*
+💡 *These numbers come from Vivado’s post-implementation power report at 75 MHz.*
 
-![Power Summary](imgs/implementation/power.png)
+![Power Summary](imgs/implementation/riscv_soc_power.png)
 
 ---
 
@@ -164,7 +169,7 @@ See [BTB Tests](tb/README.md#test-categories) for more details
 1. Clone the repo:
 
    ```bash
-   git clone https://github.com/TalhaIsrar/RISCV-RV32IM-5-Stage-Pipelined-Processor
+   git clone https://github.com/TalhaIsrar/RISCV-RV32IM-AXI4-Lite-SoC
    ```
 2. Open **Vivado** project and add files from `src/` and `tb/`.
 3. Compile RISC-V test programs from `programs/` and load them into instruction memory.
@@ -215,6 +220,8 @@ $$
 ## 🔗 References
 
 * [RISC-V ISA Manual](https://riscv.org/technical/specifications/)
+* [AMBA AXI Porotocl Specification](https://developer.arm.com/documentation/ihi0022/latest)
+* [AXI4 Lite Interface](https://www.realdigital.org/doc/a9fee931f7a172423e1ba73f66ca4081)
 * \[Computer Organization and Design RISC-V Edition – Patterson & Hennessy]
 
 ---
