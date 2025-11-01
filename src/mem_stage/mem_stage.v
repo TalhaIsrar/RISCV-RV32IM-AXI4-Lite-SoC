@@ -24,7 +24,7 @@ module mem_stage(
 );
     // Check if we have read/write instruction
     wire load_store_inst;
-    assign load_store_inst = mem_write & mem_read;
+    assign load_store_inst = mem_write || mem_read;
 
     // Byte offset from address
     wire [1:0] byte_offset;

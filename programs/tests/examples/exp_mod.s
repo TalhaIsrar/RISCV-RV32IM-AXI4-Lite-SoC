@@ -2,37 +2,68 @@
     .globl _start
 
 _start:
-    # Input values
-    li x1, 7          # a
-    li x2, 13         # b
-    li x3, 20         # m
+    # ----------------------------------
+    # Base Addresses of Slaves
+    # ----------------------------------
+    li x5, 0x00000000       # Slave 0 base (operands)
+    li x6, 0x00000100       # Slave 1 base (intermediate results)
+    li x7, 0x00001000       # Slave 2 base (final output)
 
-    # Initialize result = 1
-    li x4, 1          # result
-    add x5, x2, x0    # copy exponent to x5 (exp)
+    # ----------------------------------
+    # Initialize Operands in Slave 0
+    # a = 7, b = 13, m = 20
+    # ----------------------------------
+    li x1, 7
+    li x2, 13
+    li x3, 20
+    sw x1, 0(x5)            # store a
+    sw x2, 4(x5)            # store b
+    sw x3, 8(x5)            # store m
+
+    # ----------------------------------
+    # Load operands from different slaves
+    # (simulate distributed memory reads)
+    # ----------------------------------
+    lw x8, 0(x5)            # load a  from Slave 0
+    lw x9, 4(x5)            # load b  from Slave 0
+    lw x10, 8(x5)           # load m  from Slave 0
+
+    # Initialize result = 1, exp = b
+    li x11, 1               # result
+    add x12, x9, x0         # exp = b
 
 modexp_loop:
-    # Check if exponent == 0
-    beq x5, x0, modexp_done
+    beq x12, x0, modexp_done   # if exp == 0 → done
 
-    # If exponent % 2 == 1, multiply result by a
-    andi x6, x5, 1
-    beq x6, x0, skip_mult
+    # if (exp % 2 == 1)
+    andi x13, x12, 1
+    beq x13, x0, skip_mult
 
     # result = (result * a) % m
-    mul x4, x4, x1
-    rem x4, x4, x3
+    mul x11, x11, x8
+    rem x11, x11, x10
+    sw x11, 0(x6)             # store result in Slave 1
+
+    # Read back result to simulate slave read
+    lw x11, 0(x6)
 
 skip_mult:
     # a = (a * a) % m
-    mul x1, x1, x1
-    rem x1, x1, x3
+    mul x8, x8, x8
+    rem x8, x8, x10
+    sw x8, 4(x6)              # store squared a in Slave 1
 
     # exp = exp >> 1
-    srli x5, x5, 1   # logical shift right
+    srli x12, x12, 1
+    sw x12, 8(x6)             # store shifted exp in Slave 1
+    lw x12, 8(x6)             # read back exp
+
     j modexp_loop
 
 modexp_done:
-    add x7, x0, x4 # Final result in x7
-end: 
+    # Read Final Result from Slave 1
+    lw x14, 0(x6)
+    sw x14, 0(x7)             # Final result memory-mapped to Slave 2
+
+end:
     j end
