@@ -166,7 +166,7 @@ See [BTB Tests](tb/README.md#test-categories) for more details
    ```bash
    git clone https://github.com/TalhaIsrar/RISCV-RV32IM-5-Stage-Pipelined-Processor
    ```
-2. Open **ModelSim** or **Vivado** project and add files from `src/` and `tb/`.
+2. Open **Vivado** project and add files from `src/` and `tb/`.
 3. Compile RISC-V test programs from `programs/` and load them into instruction memory.
 
 ---
