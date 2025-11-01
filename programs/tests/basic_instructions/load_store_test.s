@@ -21,9 +21,9 @@ _start:
 
     # Byte store/load
     addi  x9, x0, 0xFF
-    sb    x9, 10(x1)
-    lb    x10, 10(x1)
-    lbu   x11, 10(x1)
+    sb    x9, 12(x1)
+    lb    x10, 12(x1)
+    lbu   x11, 12(x1)
 
 done:
     j done

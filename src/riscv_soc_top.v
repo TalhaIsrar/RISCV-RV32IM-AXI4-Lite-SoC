@@ -6,7 +6,6 @@ module riscv_soc_top(
     output pc_en,
     output led
 );
-
     // EX/IF Signals
     wire [31:0] ex_if_pc_jump_addr;
     wire ex_jump_en;
