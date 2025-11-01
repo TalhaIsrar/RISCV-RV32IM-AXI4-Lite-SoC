@@ -3,8 +3,10 @@ module riscv_soc_top(
     input rst,
     output [31:0] wb_result,
     output [31:0] ex_result,
-    output pc_en
+    output pc_en,
+    output led
 );
+
     // EX/IF Signals
     wire [31:0] ex_if_pc_jump_addr;
     wire ex_jump_en;
@@ -356,7 +358,10 @@ module riscv_soc_top(
         .axi_read_busy(axi_read_busy)
     );
 
-    axi4_lite_peripheral_top axi4_lite_bus(
+    axi4_lite_peripheral_top #(
+        .ADDR_WIDTH(32),
+        .DATA_WIDTH(32)
+    ) axi4_lite_bus(
         .clk(clk),
         .rst(rst),
         .write_start(axi_write_start),
@@ -367,7 +372,8 @@ module riscv_soc_top(
         .read_start(axi_read_start),
         .read_addr(axi_read_addr),
         .read_data(axi_read_data),
-        .read_busy(axi_read_busy)
+        .read_busy(axi_read_busy),
+        .led(led)
     );
 
     // Instantiate the MEM/WB pipeline module

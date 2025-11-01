@@ -19,7 +19,9 @@ module axi4_lite_peripheral_top #(
     input  logic                   read_start,
     input  logic [ADDR_WIDTH-1:0]  read_addr,
     output logic [DATA_WIDTH-1:0]  read_data,
-    output logic                   read_busy
+    output logic                   read_busy,
+
+    output logic                   led
 );
 
     // Master interface signals
@@ -123,4 +125,14 @@ module axi4_lite_peripheral_top #(
         .read_data(peripheral_read_data[1])
     );
 
+    // Slave 3 - LED
+    led led_inst(
+        .clk(clk),
+        .rst(rst),
+        .led_write(peripheral_write_data[2]),
+        .write_enable(peripheral_mem_write[2]),
+        .led_out(peripheral_read_data[2])
+    );
+
+    assign led = peripheral_read_data[2];
 endmodule
