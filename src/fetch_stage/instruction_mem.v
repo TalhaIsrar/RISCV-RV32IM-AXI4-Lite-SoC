@@ -16,7 +16,7 @@ module instruction_mem(
 
     // Initialize memory using file
     initial begin
-        $readmemh("C:\\Users\\Talha\\Documents\\vivado\\riscv_soc\\programs\\instructions.hex", mem);
+        $readmemh("C:\\Users\\Talha\\Documents\\vivado\\riscv_rv32im_axi4_lite_soc\\programs\\instructions.hex", mem);
     end
 
     // Add this for synthesis to block RAM

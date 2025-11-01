@@ -12,7 +12,7 @@ _start:
     lw    x4, 0(x1)
     lw    x5, 4(x1)
 
-    mul   x6, x4, x5
+    add   x6, x4, x5
 
 done:
     j done
