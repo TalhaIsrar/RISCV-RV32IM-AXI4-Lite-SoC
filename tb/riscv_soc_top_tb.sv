@@ -1,12 +1,12 @@
 `timescale 1ns/1ps
 
-module rv32i_core_tb;
+module riscv_soc_top_tb;
 
     reg clk;
     reg rst;
 
     // Instantiate the core
-    rv32i_core dut (
+    riscv_soc_top dut (
         .clk(clk),
         .rst(rst)
     );
@@ -24,7 +24,7 @@ module rv32i_core_tb;
         #20;       // Hold reset for 20ns
         rst = 0;
 
-        // Run simulation for 500ns then finish
+        // Run simulation for 1700ns then finish
         #1700;
         $finish;
     end

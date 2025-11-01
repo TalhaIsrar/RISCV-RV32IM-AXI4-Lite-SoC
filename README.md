@@ -1,7 +1,7 @@
-# Axi4-lite based RISCV SoC- test branch
+# RISCV RV32IM AXI4-Lite sOc
 
-This repository contains the implementation and verification of a RISC-V RV32IM processor with a classic 5-stage pipeline.
-The design supports the base **RV32I** instruction set along with **M-extension** (multiplication and division). It also has a hazard unit for flushing/stalling the pipeline, a forwarding unit to prevent data hazards, and a branch target buffer for branch prediction.
+This repository contains the implementation and verification of a 5-stage pipelined RISC-V RV32IM processor as part of a AXI4-Lite based SoC.
+The design supports the base **RV32I** instruction set along with **M-extension** (multiplication and division). It also has a hazard unit for flushing/stalling the pipeline, a forwarding unit to prevent data hazards, and a branch target buffer for branch prediction. The design supports 1 Master and multiple slaves over an Axi4-lite interconnect.
 
 ---
 
@@ -29,7 +29,7 @@ The design supports the base **RV32I** instruction set along with **M-extension*
 
 ## 📊 Block Diagram
 
-![RV32IM Core Top](imgs/rv32im_block_diagram.png)
+![RV32IM SoC Top](imgs/rv32im_block_diagram.png)
 
 ---
 

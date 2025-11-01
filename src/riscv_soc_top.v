@@ -1,4 +1,4 @@
-module rv32i_core(
+module riscv_soc_top(
     input clk,
     input rst,
     output [31:0] wb_result,
