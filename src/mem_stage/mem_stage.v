@@ -1,8 +1,6 @@
 `include "../defines.vh"
 
 module mem_stage(
-    input clk,
-    input rst,
     input [31:0] result,
     input [31:0] op2_data,
     input mem_write,
@@ -11,16 +9,19 @@ module mem_stage(
     input [2:0] load_type,
     output reg [31:0] read_data,
     output wire [31:0] calculated_result,
-    output wire stall_axi
+    output wire stall_axi,
+
+    // IO from AXI4 Lite
+    output axi_write_start,
+    output [31:0] axi_write_addr,
+    output [31:0] axi_write_data,
+    output [3:0] axi_write_strobe,
+    input axi_write_busy,
+    output axi_read_start,
+    output [31:0] axi_read_addr,
+    input [31:0] axi_read_data,
+    input axi_read_busy
 );
-
-
-    //TODO: Integrate AXI4-lite here
-    //TODO: Make sure load store still work
-    //TODO: Make sure byte/hardword/word store/load still works
-    //TODO: Stall CPU if AXI4-lite based approach takes multiple cycles
-    //TODO: Modify the MEM/WB Pipeline module because it doesnt register the read_data signal
-
     // Check if we have read/write instruction
     wire load_store_inst;
     assign load_store_inst = mem_write & mem_read;
@@ -53,61 +54,49 @@ module mem_stage(
         endcase
     end
 
-    // Read data from axi interconnect
-    wire [31:0] read_data_axi;
-
     // Stall signals from axi
-    wire write_busy, read_busy;
+    assign stall_axi = axi_write_busy || axi_read_busy; 
 
-    assign stall_axi = write_busy || read_busy; 
-
-    axi4_lite_peripheral_top axi4_lite_bus(
-        .clk(clk),
-        .rst(rst),
-        .write_start(mem_write),
-        .write_addr(result),
-        .write_data(op2_data),
-        .write_strobe(write_byte_strobe),
-        .write_busy(write_busy),
-        .read_start(mem_read),
-        .read_addr(result),
-        .read_data(read_data_axi),
-        .read_busy(read_busy)
-    );
+    assign axi_write_start = mem_write;
+    assign axi_write_addr = result;
+    assign axi_write_data = op2_data;
+    assign axi_write_strobe = write_byte_strobe;
+    assign axi_read_start = mem_read;
+    assign axi_read_addr = result;
 
     // Perform byte/half-word selection and sign/zero extension *after* the read.
     always @(*) begin
         case (load_type)
             `LOAD_LB: begin // LB - load byte, sign extend
                 case (byte_offset)
-                    2'b00: read_data = {{24{read_data_axi[7]}},  read_data_axi[7:0]};
-                    2'b01: read_data = {{24{read_data_axi[15]}}, read_data_axi[15:8]};
-                    2'b10: read_data = {{24{read_data_axi[23]}}, read_data_axi[23:16]};
-                    2'b11: read_data = {{24{read_data_axi[31]}}, read_data_axi[31:24]};
+                    2'b00: read_data = {{24{axi_read_data[7]}},  axi_read_data[7:0]};
+                    2'b01: read_data = {{24{axi_read_data[15]}}, axi_read_data[15:8]};
+                    2'b10: read_data = {{24{axi_read_data[23]}}, axi_read_data[23:16]};
+                    2'b11: read_data = {{24{axi_read_data[31]}}, axi_read_data[31:24]};
                     default: read_data = 32'h00000000;
                 endcase
             end
             `LOAD_HD: begin // LH - load halfword, sign extend
-                if (byte_offset[1] == 1'b0) read_data = {{16{read_data_axi[15]}}, read_data_axi[15:0]};
-                else                        read_data = {{16{read_data_axi[31]}}, read_data_axi[31:16]};
+                if (byte_offset[1] == 1'b0) read_data = {{16{axi_read_data[15]}}, axi_read_data[15:0]};
+                else                        read_data = {{16{axi_read_data[31]}}, axi_read_data[31:16]};
             end
             `LOAD_LW: begin // LW - load word
-                read_data = read_data_axi;
+                read_data = axi_read_data;
             end
             `LOAD_LBU: begin // LBU - load byte, zero extend
                 case (byte_offset)
-                    2'b00: read_data = {24'h0, read_data_axi[7:0]};
-                    2'b01: read_data = {24'h0, read_data_axi[15:8]};
-                    2'b10: read_data = {24'h0, read_data_axi[23:16]};
-                    2'b11: read_data = {24'h0, read_data_axi[31:24]};
+                    2'b00: read_data = {24'h0, axi_read_data[7:0]};
+                    2'b01: read_data = {24'h0, axi_read_data[15:8]};
+                    2'b10: read_data = {24'h0, axi_read_data[23:16]};
+                    2'b11: read_data = {24'h0, axi_read_data[31:24]};
                     default: read_data = 32'h00000000;
                 endcase
             end
             `LOAD_LHU: begin // LHU - load halfword, zero extend
-                if (byte_offset[1] == 1'b0) read_data = {16'h0, read_data_axi[15:0]};
-                else                        read_data = {16'h0, read_data_axi[31:16]};
+                if (byte_offset[1] == 1'b0) read_data = {16'h0, axi_read_data[15:0]};
+                else                        read_data = {16'h0, axi_read_data[31:16]};
             end
-            default: read_data = read_data_axi;
+            default: read_data = axi_read_data;
         endcase
     end
 

@@ -81,6 +81,17 @@ module riscv_soc_top(
     wire        mem_wb_load;
     wire        mem_wb_reg_file;
 
+    // IO to/from AXI4 Lite
+    wire axi_write_start;
+    wire [31:0] axi_write_addr;
+    wire [31:0] axi_write_data;
+    wire [3:0] axi_write_strobe;
+    wire axi_write_busy;
+    wire axi_read_start;
+    wire [31:0] axi_read_addr;
+    wire [31:0] axi_read_data;
+    wire axi_read_busy;
+
     // MEM/WB Connection
     wire [31:0] mem_read_data, wb_read_data;
     wire [31:0] mem_calculated_result, wb_calculated_result;
@@ -324,8 +335,6 @@ module riscv_soc_top(
 
     // Instantiate the Memory stage module
     mem_stage mem_stage_inst (
-        .clk(clk),
-        .rst(rst),
         .result(mem_result),
         .op2_data(mem_op2_selected),
         .mem_write(mem_memory_write),
@@ -334,7 +343,31 @@ module riscv_soc_top(
         .load_type(mem_memory_load_type),
         .read_data(mem_read_data),
         .calculated_result(mem_calculated_result),
-        .stall_axi(stall_axi)
+        .stall_axi(stall_axi),
+
+        .axi_write_start(axi_write_start),
+        .axi_write_addr(axi_write_addr),
+        .axi_write_data(axi_write_data),
+        .axi_write_strobe(axi_write_strobe),
+        .axi_write_busy(axi_write_busy),
+        .axi_read_start(axi_read_start),
+        .axi_read_addr(axi_read_addr),
+        .axi_read_data(axi_read_data),
+        .axi_read_busy(axi_read_busy)
+    );
+
+    axi4_lite_peripheral_top axi4_lite_bus(
+        .clk(clk),
+        .rst(rst),
+        .write_start(axi_write_start),
+        .write_addr(axi_write_addr),
+        .write_data(axi_write_data),
+        .write_strobe(axi_write_strobe),
+        .write_busy(axi_write_busy),
+        .read_start(axi_read_start),
+        .read_addr(axi_read_addr),
+        .read_data(axi_read_data),
+        .read_busy(axi_read_busy)
     );
 
     // Instantiate the MEM/WB pipeline module
