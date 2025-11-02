@@ -3,7 +3,15 @@
 This directory contains a **modular and scalable AXI4-Lite interconnect** designed for the **RISC-V SoC** project.
 It connects a **single AXI4-Lite master** (the RISC-V CPU’s memory stage) to **multiple memory-mapped slave peripherals** such as on-chip memory, GPIO, or UART.
 
-This subsystem forms the backbone of peripheral communication in the SoC, allowing simple, low-latency register-based access through a standardized bus interface.
+This subsystem forms the backbone of peripheral communication in the SoC, allowing simple, low-latency register-based access through a standardized bus interface. This module is built with the help of axi-lite master-slave interfaces given at [axi4_lite](../axi4_lite/).
+
+---
+
+### 🧭 Interconnect Block Diagram
+
+Below is the visual overview of the interconnect architecture:
+
+![AXI4-Lite Interconnect Diagram](../../imgs/axi4_lite/axi4lite_interconnect.png)
 
 ---
 
@@ -16,7 +24,6 @@ This subsystem forms the backbone of peripheral communication in the SoC, allowi
 | **`axi4_lite_addr_map_pkg.sv`** | Central package defining all slave base addresses and masks — easily extendable for new peripherals.                                |
 | **`axi4_lite_interconnect.sv`** | Top-level interconnect that routes signals between the master and multiple slaves, performs address decoding, and merges responses. |
 
-This module is built with the help of axi-lite master-slave interfaces given at [axi4_lite](../axi4_lite/).
 ---
 
 ### 🧠 Concept Overview
@@ -112,14 +119,6 @@ axi4_lite_interconnect #(
 |                    | `RRESP`   | Slave → Master | Read response status            |
 |                    | `RVALID`  | Slave → Master | Data valid handshake            |
 |                    | `RREADY`  | Master → Slave | Master ready to accept data     |
-
----
-
-### 🧭 Interconnect Block Diagram
-
-Below is the visual overview of the interconnect architecture:
-
-![AXI4-Lite Interconnect Diagram](../../imgs/axi4_lite/axi4lite_interconnect.png)
 
 ---
 

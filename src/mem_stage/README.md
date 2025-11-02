@@ -1,15 +1,12 @@
 # Memory Stage Module
 
 This folder contains the implementation of the **Memory (MEM) stage** for the RV32IM 5-stage pipelined processor.
-The MEM stage handles **memory read/write operations** and passes the ALU result forward to the next stage.
+The MEM stage handles **memory read/write operations** and passes the ALU result forward to the next stage. This module is connected to the AXI4-lite as a Master and handles sending/recieving data.
 
 ## 📂 Folder Structure
 
 * **mem_stage.v**
   RTL Verilog file implementing the MEM stage.
-
-* **data_mem.v**
-  Synchronous data memory module with support for byte, halfword, and word accesses.
 
 * **README.md**
   This documentation file.
@@ -17,7 +14,7 @@ The MEM stage handles **memory read/write operations** and passes the ALU result
 ## 🚀 Features
 
 * Handles **load** and **store** instructions with byte, halfword, and word granularity.
-* Synchronous read and write operations using BRAM inference.
+* Passes and reads data according to the byte enable to/from the AXI4 Lite slaves
 * Computes the value to forward to the Writeback stage.
 
 ## 📜 How It Works
@@ -36,29 +33,8 @@ The MEM stage handles **memory read/write operations** and passes the ALU result
 | `read_data`         | output    | 32    | Data read from memory (to WB stage)      |
 | `calculated_result` | output    | 32    | ALU result forwarded to WB stage         |
 
-### Behavior
-
-* **Memory Write:** Writes `op2_data` into memory according to `store_type` and address alignment.
-* **Memory Read:** Reads data from memory, applies sign/zero extension based on `load_type`.
-* **Forwarding:** ALU result is forwarded to the Writeback stage unmodified.
-
-```verilog
-assign calculated_result = result;
-```
-
-## 📊 Block Diagram - Memory Stage
-
-![Memory Stage](../../imgs/stages/rv32im_mem_stage.png)
-
----
-
-* The memory logic is fully synchronous with **byte-enable support**, ensuring proper alignment and correct data width handling.
-
-![Data Memory](../../imgs/submodules/rv32im_data_mem.png)
-
 ## 📌 Notes
 
-* Fully synchronous design optimized for BRAM inference in Vivado.
 * Compatible with 5-stage RV32IM pipeline.
 * Supports byte/halfword/word loads and stores with proper sign/zero extension.
 
