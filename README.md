@@ -19,6 +19,7 @@ The design supports the base **RV32I** instruction set along with **M-extension*
 * [FPGA Resource Utilization](#-fpga-resource-utilization)
 * [Power Consumption](#-power-consumption)
 * [How to Run](#-how-to-run)
+* [Adding Peripherals](#-adding-peripherals)
 * [Test Example](#-test-example)
 * [Future Work](#-future-work)
 * [References](#-references)
@@ -29,7 +30,7 @@ The design supports the base **RV32I** instruction set along with **M-extension*
 
 ## 📊 Block Diagram
 
-![RV32IM SoC Top](imgs/rv32im_block_diagram.png)
+![RISCV SoC](imgs/riscv_soc_block_diagram.png)
 
 ---
 
@@ -75,7 +76,7 @@ Each stage has its own folder with detailed documentation:
 ### Special Notes
 
 * In **IF/ID**, no extra instruction register is needed (instruction memory has 1-cycle latency).
-* Some pipelines have flush and enable signals to stall or flush the instructions.
+* Some pipelines have flush and enable signals to stall or flush the instructions. [Click](src/pipeline_registers/README.md) for more detals.
 * Unused instruction memory addresses are not initalized to anything to avoid reset overhead.
 * Insertion of AXI4 slave makes memory-mapped access take atleast 3 cycles whereas having data memory directly in mem-stage takes 1 cycle.
 
@@ -97,6 +98,10 @@ The list of supported instructions by the processor is listed below. These are a
 
 ![Instructions RV32I](imgs/rv32i_instructions.png)
 ![Instructions RV32IM](imgs/rv32im_instructions.png)
+
+## 📊 RV32IM Core Connections
+
+![RV32IM Top](imgs/rv32im_block_diagram.png)
 
 ## ⚡ Performance Improvements
 
@@ -175,6 +180,14 @@ See [BTB Tests](tb/README.md#test-categories) for more details
    ```
 2. Open **Vivado** project and add files from `src/` and `tb/`.
 3. Compile RISC-V test programs from `programs/` and load them into instruction memory.
+
+---
+
+## 🧩 Adding Peripherals
+
+1. In file [axi4_lite_addr_map_pkg](src/axi4_lite_interconnect/axi4_lite_addr_map_pkg.sv) increment the slave number and add the appropriate base addr and mask.
+2. In file [axi4_lite_peripheral_top](src/axi4_lite_peripheral_top.sv) add your new slave at bottom and connect the apporopriate signals from interconnect.
+3. Make sure data and address widths match, the core is 32 bit based.
 
 ---
 

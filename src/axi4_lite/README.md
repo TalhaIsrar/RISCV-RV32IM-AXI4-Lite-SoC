@@ -24,11 +24,19 @@ Both the master and slave modules are compliant with the **AMBA AXI4-Lite specif
 The AXI4-Lite interface consists of five independent channels:
 two for write, two for read, and one for write response.
 
-![AXI4Lite Channels](../../imgs/axi4_lite/axi4lite_channels.png)
+<img src="../../imgs/axi4_lite/axi4lite_channels.png" width="500">
 *(Diagram source: [All about circuits: Introduction to the Advanced Extensible Interface (AXI)](https://www.allaboutcircuits.com/technical-articles/introduction-to-the-advanced-extensible-interface-axi/))*  
+
 
 | Channel            | Signal    | Direction      | Description                                              |
 | ------------------ | --------- | -------------- | -------------------------------------------------------- |
+| **Read Address**   | `ARADDR`  | Master → Slave | Read address for the transaction.                        |
+|                    | `ARVALID` | Master → Slave | Indicates a valid read address.                          |
+|                    | `ARREADY` | Slave → Master | Indicates the slave is ready to accept the read address. |
+| **Read Data**      | `RDATA`   | Slave → Master | Data returned from the slave.                            |
+|                    | `RRESP`   | Slave → Master | Read response status.                                    |
+|                    | `RVALID`  | Slave → Master | Indicates valid read data is available.                  |
+|                    | `RREADY`  | Master → Slave | Master ready to accept read data.                        |
 | **Write Address**  | `AWADDR`  | Master → Slave | Write address for the transaction.                       |
 |                    | `AWVALID` | Master → Slave | Indicates a valid write address is available.            |
 |                    | `AWREADY` | Slave → Master | Indicates the slave is ready to accept the address.      |
@@ -39,13 +47,6 @@ two for write, two for read, and one for write response.
 | **Write Response** | `BRESP`   | Slave → Master | Response status (`OKAY`, `SLVERR`, etc.).                |
 |                    | `BVALID`  | Slave → Master | Indicates valid response.                                |
 |                    | `BREADY`  | Master → Slave | Master ready to accept response.                         |
-| **Read Address**   | `ARADDR`  | Master → Slave | Read address for the transaction.                        |
-|                    | `ARVALID` | Master → Slave | Indicates a valid read address.                          |
-|                    | `ARREADY` | Slave → Master | Indicates the slave is ready to accept the read address. |
-| **Read Data**      | `RDATA`   | Slave → Master | Data returned from the slave.                            |
-|                    | `RRESP`   | Slave → Master | Read response status.                                    |
-|                    | `RVALID`  | Slave → Master | Indicates valid read data is available.                  |
-|                    | `RREADY`  | Master → Slave | Master ready to accept read data.                        |
 
 ---
 
