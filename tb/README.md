@@ -1,6 +1,6 @@
 # Testbench (TB) Folder
 
-This folder contains the **verification testbenches** for the RISC-V core design.  
+This folder contains the **verification testbenches** for the RISCV SoC design.  
 The goal of these tests is to validate both functionality and performance under different workloads.
 
 The processor was tested using a variety of test assembly codes. To further test the processor real life examples were used. These can be found at [Example Programs](../programs/tests/examples) with their [Results](../imgs/tests/programs).
@@ -9,7 +9,16 @@ The processor was tested using a variety of test assembly codes. To further test
 
 ## 📂 Test Categories
 
-### 1. Branch Target Buffer (BTB) Stress Tests
+### 1. AXI4-Lte based Slaves access tests
+- Covers **load** directly followed by **forwarded operand R Type instruction**.
+- Covers **load** directly followed by **multiplication instruction**.
+- Covers multi-slave access tests.
+- These tests can be found at [AXi4 lite tests](../programs/tests/axi4_lite/).
+
+One such test result can be seen below. The following test is of access of 3 slaves.
+![Multiplication SW](../imgs/tests/axi4_lite/multislave_test.png)
+
+### 2. Branch Target Buffer (BTB) Stress Tests
 - Validates the **BTB correctness** under frequent taken/not-taken branches.
 - A variety of tests for different workloads are compared and presented below. The tests can be found at [Branch Target Buffer tests](../programs/tests/btb/).
 - The improvement from using the Branch Target Buffer (BTB) is calculated as:
@@ -47,7 +56,7 @@ After using the BTB we get the following results. The BTB is connected and dis-c
 
 See [Results](../imgs/tests/btb/) for more results.
 
-### 2. Multiplication Tests
+### 3. Multiplication Tests
 - Covers **shift-and-add multiply** (software) and **hardware MUL instructions**.
 - Covers **shift-and-sub divide** (software) and **hardware DIV/REM instructions**.
 - The main tests can be found at [M Unit Tests](../programs/tests/m_unit/).
@@ -74,16 +83,16 @@ Where:
 | Multiply     |        231        |      10      |    95.7 %   |  21.3x  |
 | Divide       |        350        |      41      |    88.3 %   |  8.54x  |
 
-One such result can be seen below. The following test is of Multiplication.
-![Multiplication SW](../imgs/tests/m_unit/mul_sw.png)
+One such result can be seen below. The following test is of Division using software approach.
+![Division SW](../imgs/tests/m_unit/div_sw.png)
 
 Using the M instructions from M extension we get the same result but in much less cycles.
 
-![Multiplication HW](../imgs/tests/m_unit/mul_hw.png)
+![Division HW](../imgs/tests/m_unit/div_hw.png)
 
 See [Results](../imgs/tests/m_unit/) for more results.
 
-### 3. Forwarding and Hazard Tests
+### 4. Forwarding and Hazard Tests
 
 - Forwarding Unit: Click on [Forwarding Test](../programs/basic_instructions/forwarding_test.s) to see the assembly code for the test.
 
@@ -94,7 +103,7 @@ See [Results](../imgs/tests/m_unit/) for more results.
    - M Unit Stall
    - Jump/Branch Stall and Flush
 
-### 4. General ISA & Functional Tests
+### 5. General ISA & Functional Tests
 The following contrains different test cases for different functional scenarios. The exact assembly code will also be available.
 
 - ALU Edge Cases: Click on [ALU Edge](../programs/basic_instructions/alu_edgecases.s) to see the assembly code for the test.
@@ -104,10 +113,6 @@ The following contrains different test cases for different functional scenarios.
 - Load-Store Tests: Click on [Load Store](../programs/basic_instructions/load_store_test.s) to see the assembly code for the test.
 
 ![ALU Edge](../imgs/tests/general/load_store.png)
-
-- All instructions test: Click on [All Instructions](../programs/basic_instructions/all_instructions.s) to see the assembly code for the test.
-
-![All Instructions](../imgs/tests/general/overall_test.png)
 ---
 
 ## Running Tests

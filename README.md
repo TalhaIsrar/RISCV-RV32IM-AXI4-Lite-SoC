@@ -77,6 +77,7 @@ Each stage has its own folder with detailed documentation:
 * In **IF/ID**, no extra instruction register is needed (instruction memory has 1-cycle latency).
 * Some pipelines have flush and enable signals to stall or flush the instructions.
 * Unused instruction memory addresses are not initalized to anything to avoid reset overhead.
+* Insertion of AXI4 slave makes memory-mapped access take atleast 3 cycles whereas having data memory directly in mem-stage takes 1 cycle.
 
 ---
 

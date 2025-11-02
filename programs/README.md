@@ -1,6 +1,6 @@
-# RISC-V Assembly Programs for 5-Stage Pipeline Processor
+# Aseembly code for RISCV RV32IM AXI4-Lite Based SoC
 
-This directory contains assembly programs and test cases for the **RV32IM 5-stage pipeline processor** implemented in Verilog/VHDL. The programs are compiled into machine code (`.hex`) that can be loaded into the instruction memory of the processor during simulation or FPGA synthesis.
+This directory contains assembly programs and test cases for the **RISCV RV32IM SoC** implemented in Verilog/SystemVerilog. The programs are compiled into machine code (`.hex`) that can be loaded into the instruction memory of the processor during simulation or FPGA synthesis.
 
 ---
 
@@ -13,13 +13,13 @@ programs/
 │── instructions.hex     # Generated hex file for instruction memory
 │── Makefile             # Build automation (assemble, link, hex conversion)
 │
-└── tests/               # Additional test programs
-    │── alu_edgecases.s
+└── tests/               # Additional test programs (sorted in folders)
+    │── axi4_lite/
+    │── btb/
+    │── m_unit/
     .
     .
     .
-
-
 ````
 
 ---
@@ -57,7 +57,7 @@ make clean
 * **`instructions.elf`** → Executable and Linkable Format output
 * **`instructions.bin`** → Raw binary
 * **`instructions.hex`** → Hex file (one instruction per line, 32-bit little-endian) for loading into the processor’s instruction memory
-* **`program.dump`** → Disassembly for debugging/reference
+* **`program.dump`**     → Disassembly for debugging/reference
 
 ---
 
@@ -68,10 +68,10 @@ The `Makefile` automates the process of turning RISC-V assembly into a usable `.
 ### Variables
 
 * `RISCV_PREFIX = riscv64-unknown-elf` → Prefix for the RISC-V cross toolchain.
-* `CC = $(RISCV_PREFIX)-gcc` → Assembler/compiler.
-* `OBJCOPY = $(RISCV_PREFIX)-objcopy` → Converts between object file formats.
-* `OBJDUMP = $(RISCV_PREFIX)-objdump` → Produces disassembly.
-* `SRC`, `ELF`, `BIN`, `HEX` → Filenames for source and generated outputs.
+* `CC = $(RISCV_PREFIX)-gcc`           → Assembler/compiler.
+* `OBJCOPY = $(RISCV_PREFIX)-objcopy`  → Converts between object file formats.
+* `OBJDUMP = $(RISCV_PREFIX)-objdump`  → Produces disassembly.
+* `SRC`, `ELF`, `BIN`, `HEX`           → Filenames for source and generated outputs.
 
 ### Build Rules
 
