@@ -185,9 +185,10 @@ See [BTB Tests](tb/README.md#test-categories) for more details
 
 ## 🧩 Adding Peripherals
 
-1. In file [axi4_lite_addr_map_pkg](src/axi4_lite_interconnect/axi4_lite_addr_map_pkg.sv) increment the slave number and add the appropriate base addr and mask.
-2. In file [axi4_lite_peripheral_top](src/axi4_lite_peripheral_top.sv) add your new slave at bottom and connect the apporopriate signals from interconnect.
-3. Make sure data and address widths match, the core is 32 bit based.
+1. Add your peripheral into [peripherals](src/peripherals/) folder.
+2. In file [axi4_lite_addr_map_pkg](src/axi4_lite_interconnect/axi4_lite_addr_map_pkg.sv) increment the slave number and add the appropriate base addr and mask.
+3. In file [axi4_lite_peripheral_top](src/axi4_lite_peripheral_top.sv) add your new slave at bottom and connect the apporopriate signals from interconnect.
+4. Make sure data and address widths match, the core is 32 bit based.
 
 ---
 
