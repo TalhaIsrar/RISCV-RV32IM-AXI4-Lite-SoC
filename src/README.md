@@ -1,12 +1,13 @@
-# RV32IM Core – 5-Stage Pipelined Processor
+# RISCV SoC
 
-This project implements a **5-stage pipelined RISC-V RV32IM processor** in Verilog. It follows the classical pipeline structure (IF → ID → EX → MEM → WB) with additional modules for branch prediction, hazard detection, forwarding, and multiplication/division support.
+This project implements a RISCV SoC with **5-stage pipelined RISC-V RV32IM processor** and AXI4 Lite based interconnect. It follows the classical pipeline structure (IF → ID → EX → MEM → WB) with additional modules for branch prediction, hazard detection, forwarding, and multiplication/division support.
+Furthermore, there are wrappers for AXI4 Master/Slave, the interconnect network and top module connections
 
 ---
 
 ## Block Diagram
 
-![RV32IM Core Top](../imgs/rv32im_block_diagram.png)
+![RISCV SoC Top](../imgs/riscv_soc_block_diagram.png)
 
 ---
 
@@ -46,7 +47,18 @@ This project implements a **5-stage pipelined RISC-V RV32IM processor** in Veril
 
 ## Key Supporting Units
 
-### 1. Branch Target Buffer (BTB)
+### 1. AXI4 Lite Master/Slave, Interconnect and Top
+
+* Single master-Multi slave AXI4 Interconnect
+* Parallel read-write support (Though procerssor only uses 1 at a time)
+* Parametrized allowing easy integration of new peripherals
+* Allows addition of memory-mapped peripherals with minimal changes
+
+![AXI4 Lite top](../imgs/axi4_lite/axi4lite_peripheral.png)
+
+---
+
+### 2. Branch Target Buffer (BTB)
 
 * Stores branch targets and prediction bits.
 * 8 - 2 way set associative buffer
@@ -58,7 +70,18 @@ This project implements a **5-stage pipelined RISC-V RV32IM processor** in Veril
 
 ---
 
-### 2. Forwarding Unit
+### 3. M-unit (Multiply/Divide Unit)
+
+* Executes RISC-V **M extension** instructions.
+* Operates alongside ALU in EX stage.
+* Provides result once ready (`m_unit_ready`).
+* Hazard unit stalls pipeline when M-unit is busy.
+
+![M unit Extension](../imgs/rv32im_m_unit.png)
+
+---
+
+### 4. Forwarding Unit
 
 * Resolves **data hazards** without stalling when possible.
 * Selects between:
@@ -72,7 +95,7 @@ This project implements a **5-stage pipelined RISC-V RV32IM processor** in Veril
 
 ---
 
-### 3. Hazard Unit
+### 5. Hazard Unit
 
 * Handles pipeline **stalls and flushes**:
 
@@ -85,38 +108,26 @@ This project implements a **5-stage pipelined RISC-V RV32IM processor** in Veril
 
 ---
 
-### 4. M-unit (Multiply/Divide Unit)
-
-* Executes RISC-V **M extension** instructions.
-* Operates alongside ALU in EX stage.
-* Provides result once ready (`m_unit_ready`).
-* Hazard unit stalls pipeline when M-unit is busy.
-
-![M unit Extension](../imgs/rv32im_m_unit.png)
-
----
-
 ## Pipeline Registers
 
 Each pipeline stage is separated by registers for timing and hazard management:
 
 * **IF/ID**: Holds instruction + PC. *No separate instruction register needed since instruction memory already has 1-cycle latency.*
 * **ID/EX**: Holds decoded operands, immediates, and control signals.
-* **EX/MEM**: Holds ALU/M-unit results and operands for memory stage. *No separate mem_result register since data memory already introduces 1-cycle latency.*
+* **EX/MEM**: Holds ALU/M-unit results and operands for memory stage.
 * **MEM/WB**: Holds data read from memory and ALU result for write-back.
-
-Both **IF/ID** and **ID/EX** pipeline registers support **flush and enable signals** from the hazard unit. On a flush, signals are set to correspond to a **NOP instruction**.
 
 ---
 
 ## Summary
 
-This RV32I processor integrates:
+This RISCV SoC processor integrates:
 
 * **5-stage pipelined datapath**
 * **Hazard detection and forwarding logic** for smooth execution
 * **BTB-based branch prediction** for reduced branch penalty
 * **M extension support** for multiplication/division
+* **AXI4 Lite Interconnect** allowing easy peripheral integration
 
 The modular design makes it easy to extend with caches, pipeline optimizations, or additional ISA extensions.
 
