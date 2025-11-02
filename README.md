@@ -85,7 +85,8 @@ Each stage has its own folder with detailed documentation:
 
 * [Branch Target Buffer (BTB)](src/branch_target_buffer/README.md) – simple branch predictor with update mechanism.
 * [M Unit](src/m_unit_extension/README.md) – RV32M extension, hardware multiplier/divider.
-* [AXI4 Lite Interconnect](src/axi4_lite_interconnect/README.md) – Interconnect structure supporting Single Master - Multiple Slave configuration
+* [AXI4 Lite](src/axi4_lite/README.md) – Contrains Master and Slave wrappers used in interconnect.
+* [AXI4 Lite Interconnect](src/axi4_lite_interconnect/README.md) – Interconnect structure supporting Single Master - Multiple Slave configuration.
 * [Forwarding Unit](src/README.md) – resolves data hazards by forwarding from MEM/WB.
 * [Hazard Unit](src/README.md) – detects load-use hazards, handles pipeline stalls and flushes.
 

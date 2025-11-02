@@ -115,6 +115,12 @@ The following contrains different test cases for different functional scenarios.
 ![ALU Edge](../imgs/tests/general/load_store.png)
 ---
 
+### 6. Hardware tests
+There are some testbenches written directly in systemverilog using directed tests. These are mainly for following componenets:
+- Branch Target Buffer
+- Multiplication Unit Extension
+- AXI4-Lite based Interconnect
+
 ## Running Tests
 
 To test different programs, use `programs/tests/` folder:
@@ -132,7 +138,7 @@ To test different programs, use `programs/tests/` folder:
    ```
 3. Use the generated `instructions.hex` as your processor’s instruction memory.
 
-4. Use the `rv32i_core_tb.sv` file for testbench and observe the results in the simulation waveform.
+4. Use the `riscv_soc_top.sv` file for testbench and observe the results in the simulation waveform.
 
 ---
 
