@@ -23,6 +23,7 @@ module riscv_soc_top(
     wire if_id_pipeline_en;
     wire id_ex_pipeline_flush;
     wire id_ex_pipeline_en;
+    wire ex_mem_pipeline_stall;
     wire ex_mem_pipeline_flush;
     wire mem_wb_pipeline_en;
     wire invalid_inst;
@@ -46,14 +47,14 @@ module riscv_soc_top(
     wire [4:0] m_unit_dest;
 
     // ID/EX Connection
-    wire [31:0] ex_pc;
+    wire [31:0] ex_pc, mem_pc;
     wire [31:0] id_op1, ex_op1;
     wire [31:0] id_op2, ex_op2;
     wire [4:0]  id_rs1, ex_rs1;
     wire [4:0]  id_rs2, ex_rs2;
     wire [4:0]  id_wb_rd, ex_wb_rd;
-    wire [31:0] id_immediate, ex_immediate;
-    wire [6:0]  id_opcode, ex_opcode;
+    wire [31:0] id_immediate, ex_immediate, mem_immediate;
+    wire [6:0]  id_opcode, ex_opcode, mem_opcode;
     wire        id_alu_src, ex_alu_src;
     wire [6:0]  id_func7, ex_func7;
     wire [2:0]  id_func3, ex_func3;
@@ -62,7 +63,7 @@ module riscv_soc_top(
     wire [1:0]  id_mem_store_type, ex_mem_store_type;
     wire        id_wb_load, ex_wb_load;
     wire        id_wb_reg_file, ex_wb_reg_file;
-    wire        id_pred_taken, ex_pred_taken;
+    wire        id_pred_taken, ex_pred_taken, mem_pred_taken;
     wire        ex_forward_pipeline_flush;
 
     // Forwarding Unit Connection
@@ -81,6 +82,9 @@ module riscv_soc_top(
     wire [1:0]  mem_memory_store_type;
     wire        mem_wb_load;
     wire        mem_wb_reg_file;
+    wire [5:0]  ex_branch_type, mem_branch_type;
+    wire [2:0]  ex_alu_flags, mem_alu_flags;
+    wire [31:0] mem_op1;
 
     // IO to/from AXI4 Lite
     wire axi_write_start;
@@ -258,13 +262,12 @@ module riscv_soc_top(
         .pc(ex_pc),
         .op1(ex_op1),
         .op2(ex_op2),
-        .pipeline_flush(ex_mem_pipeline_flush),
+        .pipeline_flush(ex_mem_pipeline_stall),
         .immediate(ex_immediate),
         .func7(ex_func7),
         .func3(ex_func3),
         .opcode(ex_opcode),
         .ex_alu_src(ex_alu_src),
-        .predictedTaken(ex_pred_taken),
         .invalid_inst(m_unit_invalid_inst),
         .ex_wb_reg_file(ex_wb_reg_file),
         .m_unit_result(m_unit_result),
@@ -279,12 +282,10 @@ module riscv_soc_top(
         .result(ex_result),
         .op1_selected(m_unit_op1),
         .op2_selected(ex_op2_selected),
-        .pc_jump_addr(ex_if_pc_jump_addr),
-        .jump_en(ex_if_jump_en),
-        .update_btb(btb_update),
-        .calc_jump_addr(btb_update_target),
         .wb_rd(alu_rd),
-        .wb_reg_file(alu_wb)
+        .wb_reg_file(alu_wb),
+        .branch_type(ex_branch_type),
+        .alu_flags(ex_alu_flags)
     );
 
     // Instantiate the Hazard Unit module
@@ -302,6 +303,7 @@ module riscv_soc_top(
         .if_id_pipeline_en(if_id_pipeline_en),
         .id_ex_pipeline_flush(id_ex_pipeline_flush),
         .id_ex_pipeline_en(id_ex_pipeline_en),
+        .ex_mem_pipeline_stall(ex_mem_pipeline_stall),
         .ex_mem_pipeline_flush(ex_mem_pipeline_flush),
         .mem_wb_pipeline_en(mem_wb_pipeline_en),
         .pc_en(pc_en),
@@ -312,6 +314,7 @@ module riscv_soc_top(
     ex_mem_pipeline ex_mem_pipeline_inst (
         .clk(clk),
         .rst(rst),
+        .pipeline_stall(ex_mem_pipeline_stall),
         .pipeline_flush(ex_mem_pipeline_flush),
         .pipeline_en(!m_unit_busy),
         .ex_result(ex_result),
@@ -322,6 +325,12 @@ module riscv_soc_top(
         .ex_wb_load(ex_wb_load),
         .ex_wb_reg_file(alu_wb),
         .ex_wb_rd(alu_rd),
+        .ex_pc(ex_pc),
+        .ex_immediate(ex_immediate),
+        .ex_op1(m_unit_op1),
+        .ex_opcode(ex_opcode),
+        .ex_branch_type(ex_branch_type),
+        .ex_alu_flags(ex_alu_flags),
 
         .mem_result(mem_result),
         .mem_op2_selected(mem_op2_selected),
@@ -331,7 +340,29 @@ module riscv_soc_top(
         .mem_memory_store_type(mem_memory_store_type),
         .mem_wb_load(mem_wb_load),
         .mem_wb_reg_file(mem_wb_reg_file),
-        .mem_wb_rd(mem_wb_rd)
+        .mem_wb_rd(mem_wb_rd),
+        .mem_pc(mem_pc),
+        .mem_immediate(mem_immediate),
+        .mem_op1(mem_op1),
+        .mem_opcode(mem_opcode),
+        .mem_predictedTaken(mem_pred_taken),
+        .mem_branch_type(mem_branch_type),
+        .mem_alu_flags(mem_alu_flags)
+    );
+
+    // Instantiate the PC Jump Module
+    pc_jump pc_jump_inst (
+        .pc(mem_pc),
+        .immediate(mem_immediate),
+        .op1(mem_op1),
+        .opcode(mem_opcode),
+        .predictedTaken(mem_pred_taken),
+        .branch_type(mem_branch_type),
+        .alu_flags(mem_alu_flags),
+        .update_pc(ex_if_pc_jump_addr),
+        .jump_addr(btb_update_target),
+        .modify_pc(ex_if_jump_en),
+        .update_btb(btb_update)
     );
 
     // Instantiate the Memory stage module

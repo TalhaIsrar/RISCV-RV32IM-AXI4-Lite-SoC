@@ -5,11 +5,9 @@ module pc_jump(
     input [31:0] immediate,
     input [31:0] op1,
     input [6:0] opcode,
-    input [2:0] func3,
-    input lt_flag,
-    input ltu_flag,
-    input zero_flag,
     input predictedTaken,
+    input [5:0] branch_type,
+    input [2:0] alu_flags,
     output [31:0] update_pc,
     output [31:0] jump_addr,
     output modify_pc,
@@ -23,26 +21,23 @@ module pc_jump(
     wire [31:0] adder_out;
     wire [31:0] pc_inc;
 
+    wire lt_flag, ltu_flag, zero_flag;
+    assign lt_flag = alu_flags[0];
+    assign ltu_flag = alu_flags[1];
+    assign alu_flags = alu_flags[2];
+
     assign jalr_inst = opcode ==`OPCODE_IJALR;
     assign jump_inst = (opcode ==`OPCODE_JTYPE) || jalr_inst;
     assign branch_inst = (opcode == `OPCODE_BTYPE);
 
     assign update_btb = jump_inst || branch_inst;
 
-    // Compute branch/jump enable
-    wire beq  = (func3 == `BTYPE_BEQ);
-    wire bne  = (func3 == `BTYPE_BNE);
-    wire blt  = (func3 == `BTYPE_BLT);
-    wire bge  = (func3 == `BTYPE_BGE);
-    wire bltu = (func3 == `BTYPE_BLTU);
-    wire bgeu = (func3 == `BTYPE_BGEU);
-
-    assign branch_taken = (beq  &&  zero_flag) ||
-                        (bne  && ~zero_flag) ||
-                        (blt  &&  lt_flag)   ||
-                        (bge  && ~lt_flag)   ||
-                        (bltu &&  ltu_flag)  ||
-                        (bgeu && ~ltu_flag);
+    assign branch_taken = (branch_type[0]  &&  zero_flag) ||
+                        (branch_type[1]  && ~zero_flag) ||
+                        (branch_type[2]  &&  lt_flag)   ||
+                        (branch_type[3]  && ~lt_flag)   ||
+                        (branch_type[4] &&  ltu_flag)  ||
+                        (branch_type[5] && ~ltu_flag);
 
     assign jump_en = jump_inst || (branch_inst && branch_taken);
 

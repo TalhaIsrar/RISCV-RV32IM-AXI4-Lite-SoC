@@ -8,7 +8,6 @@ module execute_stage(
     input [2:0] func3,
     input [6:0] opcode,
     input ex_alu_src,
-    input predictedTaken,
     input invalid_inst,
     input ex_wb_reg_file,
     input [31:0] m_unit_result,
@@ -25,12 +24,10 @@ module execute_stage(
     output wire [31:0] result,
     output wire [31:0] op1_selected,
     output wire [31:0] op2_selected,
-    output wire [31:0] pc_jump_addr,
-    output wire jump_en,
-    output wire update_btb,
-    output wire [31:0] calc_jump_addr,
     output wire [4:0] wb_rd,
-    output wire wb_reg_file
+    output wire wb_reg_file,
+    output wire [5:0] branch_type,
+    output wire [2:0] alu_flags
 );
 
     wire [3:0] ALUControl;
@@ -43,9 +40,13 @@ module execute_stage(
     wire [31:0] op1_valid;
     wire [31:0] op2_valid;
 
-    wire lt_flag;
-    wire ltu_flag;
-    wire zero_flag;    
+    // Compute branch/jump enable
+    assign branch_type[0] = (func3 == `BTYPE_BEQ); //beq
+    assign branch_type[1] = (func3 == `BTYPE_BNE); //bne
+    assign branch_type[2] = (func3 == `BTYPE_BLT); //blt
+    assign branch_type[3] = (func3 == `BTYPE_BGE); //bge
+    assign branch_type[4] = (func3 == `BTYPE_BLTU); //bltu
+    assign branch_type[5] = (func3 == `BTYPE_BGEU); //bgeu
 
     // Mux for forwarding operand 1
     always @(*) begin
@@ -105,14 +106,7 @@ module execute_stage(
         .op1(op1_forwarded),
         .opcode(opcode),
         .func3(func3),
-        .lt_flag(lt_flag),
-        .ltu_flag(ltu_flag),
-        .zero_flag(zero_flag),
         .predictedTaken(predictedTaken),
-        .update_pc(pc_jump_addr),
-        .jump_addr(calc_jump_addr),
-        .modify_pc(jump_en),
-        .update_btb(update_btb)
     );
 
     // Instantiate the ALU Controller
@@ -129,9 +123,9 @@ module execute_stage(
         .op2(op2_valid),
         .ALUControl(ALUControl),
         .result(alu_result),
-        .lt_flag(lt_flag),
-        .ltu_flag(ltu_flag),
-        .zero_flag(zero_flag)
+        .lt_flag(alu_flags[0]),
+        .ltu_flag(alu_flags[1]),
+        .zero_flag(alu_flags[2])
     );
 
     // Check if we have data from M unit
