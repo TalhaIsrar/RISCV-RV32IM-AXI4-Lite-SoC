@@ -207,7 +207,7 @@ $$
 result = (a^b) \mod m
 $$
 
-The result is saved in x7 register
+The result is saved in x14 register
 
 ### Example Test Numbers:
 
