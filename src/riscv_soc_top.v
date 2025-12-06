@@ -329,6 +329,7 @@ module riscv_soc_top(
         .ex_immediate(ex_immediate),
         .ex_op1(m_unit_op1),
         .ex_opcode(ex_opcode),
+        .ex_predictedTaken(ex_pred_taken),
         .ex_branch_type(ex_branch_type),
         .ex_alu_flags(ex_alu_flags),
 

@@ -13,7 +13,7 @@ module pc_jump(
     output modify_pc,
     output update_btb
 );
-    wire [31:0] input_a, input_b;
+    wire [31:0] input_a;
     wire jump_inst, branch_inst;
     wire jalr_inst;
     wire branch_taken;
@@ -24,7 +24,7 @@ module pc_jump(
     wire lt_flag, ltu_flag, zero_flag;
     assign lt_flag = alu_flags[0];
     assign ltu_flag = alu_flags[1];
-    assign alu_flags = alu_flags[2];
+    assign zero_flag = alu_flags[2];
 
     assign jalr_inst = opcode ==`OPCODE_IJALR;
     assign jump_inst = (opcode ==`OPCODE_JTYPE) || jalr_inst;

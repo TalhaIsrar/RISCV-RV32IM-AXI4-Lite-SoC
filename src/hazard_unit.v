@@ -53,12 +53,14 @@ module hazard_unit(
         load_stall = 1'b0;
         ex_mem_pipeline_stall = 1'b0;
         mem_wb_pipeline_en = 1'b1;
+        ex_mem_pipeline_flush = 1'b0;
 
         // Jump/Branch taken flush - 2 Stall
         if (jump_branch_taken) begin
             if_id_pipeline_flush = 1'b1;
             if_id_pipeline_en = 1'b0;
             id_ex_pipeline_flush = 1'b1;
+            ex_mem_pipeline_flush = 1'b1;
 
         end else if (mem_read_write) begin
             if_id_pipeline_en = 1'b0;

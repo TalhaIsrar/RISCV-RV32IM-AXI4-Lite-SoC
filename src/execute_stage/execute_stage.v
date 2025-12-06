@@ -99,16 +99,6 @@ module execute_stage(
     assign op1_valid = pipeline_flush ? 0 : op1_alu;
     assign op2_valid = pipeline_flush ? 0 : op2_alu;
 
-    // Instantiate the PC Jump Module
-    pc_jump pc_jump_inst (
-        .pc(pc),
-        .immediate(immediate),
-        .op1(op1_forwarded),
-        .opcode(opcode),
-        .func3(func3),
-        .predictedTaken(predictedTaken),
-    );
-
     // Instantiate the ALU Controller
     alu_control alu_control_inst (
         .func3(func3),
