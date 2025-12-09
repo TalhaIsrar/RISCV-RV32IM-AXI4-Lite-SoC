@@ -134,5 +134,15 @@ module axi4_lite_peripheral_top #(
         .led_out(peripheral_read_data[2])
     );
 
+    // Slave 4 - UART
+    uart_transmit uart_inst(
+        .clk(clk),
+        .rst(rst),
+        .addr(peripheral_write_addr[3]),
+        .wdata(peripheral_write_data[3]),
+        .write(peripheral_mem_write[3]),
+        .rdata(peripheral_read_data[3])
+    );
+
     assign led = peripheral_read_data[2];
 endmodule
